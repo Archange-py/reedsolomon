@@ -1,0 +1,1008 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>research!rsc: Finite Field Arithmetic and Reed-Solomon Coding</title>
+    <link rel="alternate" type="application/atom+xml" title="research!rsc - Atom" href="http://research.swtch.com/feed.atom"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="fonts.css" rel="stylesheet"/>
+    <link href="source-code-pro.css" rel="stylesheet"/>
+    <style>
+  body {
+    padding: 0;
+    margin: 0;
+    font-size: 100%;
+    font-family: 'Minion 3', serif;
+  }
+  @media print {
+    img {page-break-inside: avoid;}
+    div.nosplit {page-break-inside: avoid;}
+  }
+  img.center {
+    display: block;
+    margin: 0 auto;
+  }
+  img.resizable {
+    max-width: 100%;
+    height: auto;
+  }
+  .pad {
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+  a.anchor, a.back, a.footnote {
+    color: black !important;
+    text-decoration: none !important;
+  }
+  a.back {
+    font-size: 50%;
+  }
+  @media print {
+    a.back {display: none;}
+  }
+  .header {
+    height: 1.25em;
+    background-color: #dff;
+    margin: 0;
+    padding: 0.1em 0.1em 0.2em;
+    border-top: 1px solid black;
+    border-bottom: 1px solid #8ff;
+  }
+  .header h3 {
+    margin: 0;
+    padding: 0 2em;
+    display: inline-block;
+    padding-right: 2em;
+    font-style: italic;
+    font-size: 90%;
+  }
+  .rss {
+    float: right;
+    padding-top: 0.2em;
+    padding-right: 2em;
+    display: none;
+  }
+  .toc {
+    margin-top: 2em;
+  }
+  .toc-title {
+    font-family: cursive, serif;
+    font-style: italic;
+    font-size: 300%;
+    line-height: 83%;
+  }
+  .toc-subtitle {
+    display: block;
+    margin-bottom: 1em;
+    font-size: 83%;
+  }
+  @media only screen and (max-width: 550px) { .toc-subtitle { display: none; } }
+  .header h3 a {
+    color: black;
+  }
+  .header h4 {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    font-weight: normal;
+    font-size: 83%;
+  }
+  @media only screen and (max-width: 550px) { .header h4 { display: none; } }
+  .main {
+    padding: 0 2em;
+  }
+  @media only screen and (max-width: 479px) { .article { font-size: 120%; } }
+  .article h1 {
+    text-align: center;
+    font-size: 200%;
+  }
+  .copyright {
+    font-size: 83%;
+  }
+  .subtitle {
+      font-size: 65%;
+  }
+  .normal {
+    font-size: medium;
+    font-weight: normal;
+  }
+  .when {
+    text-align: center;
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .when p {
+    margin: 0;
+    padding: 0;
+  }
+  .article h2 {
+    font-size: 125%;
+    padding-top: 0.25em;
+  }
+  .article h3 {
+    font-size: 100%;
+  }
+  pre {
+    margin-left: 4em;
+    margin-right: 4em;
+  }
+  pre, code {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 90%;
+  }
+  .showcode pre {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+  }
+  .showcode-src a {
+    color: black;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 90%;
+  }
+  .showcode-comment {
+    color: #00c;
+    font-style: italic;
+  }
+  .showcode-src {
+    float: right;
+    margin-left: 2em;
+    margin-right: 2em;
+  }
+  .showcode {
+    margin-left: 2em;
+    margin-right: 2em;
+    background: #ffe;
+    padding: 0.5em;
+    border: 1px solid black;
+    font-weight: 500
+  }
+  .showcode-end {
+    clear: right;
+  }
+  .footer {
+    margin-top: 10px;
+    font-size: 83%;
+    font-family: sans-serif;
+  }
+  .comments {
+    margin-top: 2em;
+    background-color: #ffe;
+    border-top: 1px solid #aa4;
+    border-left: 1px solid #aa4;
+    border-right: 1px solid #aa4;
+  }
+  .comments-header {
+    padding: 0 5px 0 5px;
+  }
+  .comments-header p {
+    padding: 0;
+    margin: 3px 0 0 0;
+  }
+  .comments-body {
+    padding: 5px 5px 5px 5px;
+  }
+  #plus-comments {
+    border-bottom: 1px dotted #ccc;
+  }
+  .plus-comment {
+    width: 100%;
+    font-size: 14px;
+    border-top: 1px dotted #ccc;
+  }
+  .me {
+    background-color: #eec;
+  }
+  .plus-comment ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    display: inline-block;
+  }
+  .comment-when {
+    color:#999;
+    width:auto;
+    padding:0 5px;
+  }
+  .old {
+    font-size: 83%;
+  }
+  .plus-comment ul li {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 0;
+  }
+  .plus-icon {
+    width: 45px;
+  }
+  .plus-img {
+    float: left;
+    margin: 4px 4px 4px 4px;
+    width: 32px;
+    height: 32px;
+  }
+  .plus-comment p {
+    margin: 0;
+    padding: 0;
+  }
+  .plus-clear {
+    clear: left;
+  }
+  .toc-when {
+    font-size: 83%;
+    color: #999;
+  }
+  .toc {
+    list-style: none;
+  }
+  .toc li {
+    margin-bottom: 0.5em;
+  }
+  .toc-head {
+    margin-bottom: 1em !important;
+    font-size: 117%;
+  }
+  .toc-summary {
+    margin-left: 2em;
+  }
+  .favorite {
+    font-weight: bold;
+  }
+  .article p, .article ol {
+    line-height: 144%;
+  }
+  sup, sub {
+    vertical-align: baseline;
+    position: relative;
+    font-size: 83%;
+  }
+  sup {
+    bottom: 1ex;
+  }
+  sub {
+    top: 0.8ex;
+  }
+
+  .main {
+    position: relative;
+    margin: 0 auto;
+    padding: 0;
+    width: 900px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 959px) { .main { width: 708px; } }
+  @media only screen and (min-width: 640px) and (max-width: 767px) { .main { width: 580px; } }
+  @media only screen and (min-width: 480px) and (max-width: 639px) { .main { width: 420px; } }
+  @media only screen and (max-width: 479px) { .main { width: 300px; } }
+
+</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  </head>
+  <body>
+
+<div class="header">
+  <h3><a href="https://research.swtch.com/">research!rsc</a></h3>
+  <h4>Thoughts and links about programming,
+    by <a href="https://swtch.com/~rsc/" rel="author">Russ Cox</a> </h4>
+  <a class="rss" href="https://research.swtch.com/feed.atom">RSS</a>
+</div>
+
+    <div class="main">
+      <div class="article">
+        <h1>Finite Field Arithmetic and Reed-Solomon Coding
+
+        <div class="normal">
+        <div class="when">
+
+            Posted on Tuesday, April 10, 2012.
+
+
+        </div>
+        </div>
+        </h1>
+       
+<p class="lp">
+Finite fields are a branch of algebra formally defined in the 1820s,
+but interest in the topic can be traced back to
+public sixteenth-century polynomial-solving contests.
+For the next few centuries, finite fields had little practical value,
+but all changed in the last fifty years.
+It turns out that they are useful for many applications
+in modern computing, such as encryption, data compression,
+and error correction.
+</p>
+
+<p class="pp">In particular,
+Reed-Solomon codes are an error-correcting code based
+on finite fields and used everywhere today.
+One early significant use was in the
+<a href="http://en.wikipedia.org/wiki/Error_detection_and_correction#Deep-space_telecommunications">Voyager spacecraft</a>: the messages
+it still sends back today, from the edge of the solar system, are heavily
+Reed-Solomon encoded so that even if only a small fragment
+makes it back to Earth, we can still reconstruct the message.
+Reed-Solomon coding is also used on CDs to withstand scratches,
+in wireless communications to withstand transmission problems,
+in QR codes to withstand scanning errors or smudges,
+in disks to withstand loss of fragments of the media,
+in high-level storage systems like Google's GFS and BigTable
+to withstand data loss and also to reduce read latency
+(the read can complete without waiting for all the responses to arrive).
+</p>
+
+<p class="pp">
+This post shows how to implement finite field arithmetic efficiently
+on a computer,
+and then how to use that to implement Reed-Solomon encoding.
+</p>
+
+<h2>
+What is a Finite Field?
+</h2>
+
+<p class="pp">
+One way mathematicians study numbers
+is to abstract away the numbers themselves and focus
+on the operations.  (This is kind of an object-oriented
+approach to math.)
+A <i>field</i> is defined as a set F and operators
++ and · on elements of F that satisfy the following properties:
+</p>
+
+<ol>
+<li>(Closure) For all x, y in F, x+y and x·y are in F.
+</li><li>(Associative) For all x, y, z in F, (x+y)+z = x+(y+z) and (x·y)·z = x·(y·z).
+</li><li>(Commutative) For all x, y in F, x+y = y+x and x·y = y·x.
+</li><li>(Distributive) For all x, y, z in F, x·(y+z) = (x·y)+(x·z).
+</li><li>(Identity) There is some element we'll call 0 in F such that for all x in F, x+0 = x.
+Similarly, there is some element we'll call 1 in F such that for all x in F, x·1 = x.
+</li><li>(Inverse) For all x in F, there is some element y in F such that x+y = 0.  We write y = −x.
+Similarly, for all x in F except 0, there is some element y in F such that x·y = 1.  We write y = 1/x.
+</li></ol>
+
+<p class="lp">
+You probably recognize those properties from high school
+algebra class: the most well-known example of a field
+is the real numbers, where + is addition and · is multiplication.
+Other examples are complex numbers and fractions.
+</p>
+
+<p class="pp">
+A mathematician doesn't have to prove the same results over and over
+for the real numbers ℝ, the complex numbers ℂ, the fractions ℚ, and so on.
+Instead, she can prove that a particular result holds for all fields—by assuming only
+the above properties, called the field axioms.  Then she can apply the result by
+substituting a specific instance like the real numbers for the general idea of a field,
+the same way that a programmer can implement just one <code>vector(T)</code>
+and then instantiate it as <code>vector(int)</code>, <code>vector(string)</code> and so on.
+</p>
+
+<p class="pp">
+The integers ℤ are not a field: they lack multiplicative inverses.
+For example, there is no number that you can multiply by 2 to get 1, no 1/2.
+Surprisingly, though, the integers modulo any prime p do
+form a field.  For example, the integers modulo 5 are 0, 1, 2, 3, 4.
+1+4 = 0 (mod 5), so we say that 4 = −1.  Similarly, 2·3 = 1 (mod 5),
+so we say that 3 = 1/2.
+After we've proved that ℤ/p is in fact a field,
+all the results about fields can be applied to ℤ/p.
+This is very useful: it lets us apply our intuition
+about the very familiar real numbers
+to these less familiar numbers.
+This field is written ℤ/p to emphasize that we're dealing with
+what's left after subtracting out all the p's.
+That is, we're dealing with what's left if you assume that p = 0.
+When you make that assumption, you get math that wraps around at p.
+These fields are called finite fields because,
+in contrast to fields like the real numbers,
+they have a finite number of elements.
+</p>
+
+<p class="pp">
+For a programmer, the most interesting finite field is
+ℤ/2, which contains just the integers 0, 1.  Addition
+is the same as XOR, and multiplication is the same as AND.
+Note that ℤ/p is only a field when p is prime:
+arithmetic on <code>uint8</code> variables corresponds
+to ℤ/256, but it is not a field: there is no 1/2.
+</p>
+
+<h2>What can you do with a field?</h2>
+
+<p class="pp">
+The only problem with fields is that there's not a ton
+you can do with just the field axioms.
+One thing you <i>can</i> do is build polynomials,
+which were the original motivation for the
+mathematicians who pioneered the use of fields
+in the early 1800s.
+If we introduce a symbolic variable x,
+then we can build polynomials whose coefficients
+are field values.
+We'll write F[x] to denote the polynomials over x
+using coefficients from F.
+For example, if we use the real numbers ℝ as our field,
+then the polynomials ℝ[x] include x<sup>2</sup>+1, x+2, and
+3.14x<sup>2</sup> − 2.72x + 1.41.
+Like integers, these polynomials can be added and multiplied,
+but not always divided—what is (x<sup>2</sup>+1)/(x+2)?—so they are not a field.
+However, remember how the integers are not a field but
+the integers modulo a prime are a field?
+The same happens here: polynomials are not a field
+but polynomials modulo some prime polynomial <i>are</i>.
+</p>
+
+<p class="pp">
+What does “polynomials modulo
+some prime polynomial” mean anyway?
+A prime polynomial is one that cannot be factored,
+like x<sup>2</sup>+1 cannot be factored using real numbers.
+The field ℤ/5 is what you get by doing math under
+the assumption that 5 = 0; similarly, ℝ[x]/(x<sup>2</sup>+1)
+is what you get by doing math under the assumption
+that x<sup>2</sup>+1 = 0.  Just as ℤ/5 math never deals with
+numbers as big as 5, ℝ[x]/(x<sup>2</sup>+1) math never deals
+with polynomials as big as x<sup>2</sup>: anything bigger can
+have some multiple of x<sup>2</sup>+1 subtracted out again.
+That is, the polynomials in ℝ[x]/(x<sup>2</sup>+1) are bounded in size:
+they have only x<sup>1</sup> and x<sup>0</sup> (constant) terms.
+To add polynomials, we just add the coefficients using
+the addition rule from the coefficient's field,
+independently, like a vector addition.
+To multiply polynomials, we have to do the
+multiplication and then subtract out any x<sup>2</sup>+1 we can.
+If we have
+(ax+b)·(cx+d), we can expand this to
+(a·c)x<sup>2</sup> + (b·c+a·d)x + (b·d),
+and then subtract (a·c)(x<sup>2</sup>+1) = (a·c)x<sup>2</sup> + (a·c),
+producing the final result: (b·c+a·d)x + (b·d−a·c).
+That might seem like a funny definition of multiplication,
+but it does in fact obey the field axioms.
+In fact, this particular field is more familiar than it
+looks: it is the complex numbers ℂ,
+but we've written x instead of the usual i.
+Assuming that x<sup>2</sup>+1 = 0 is, except for a renaming,
+the same as defining i<sup>2</sup> = −1.
+</p>
+
+<p class="pp">
+Doing all our math modulo a prime polynomial
+let us take the field of real numbers and produce
+a field whose elements are pairs of real numbers.
+We can apply the same trick to take a finite field
+like ℤ/p and product a field whose elements are
+fixed-length vectors of elements of ℤ/p.
+The original ℤ/p has p elements.
+If we construct (ℤ/p)[x]/f(x), where f(x) is a
+prime polynomial of degree n (f's maximum x exponent is n), the resulting
+field has p<sup>n</sup> elements: all
+the vectors made up of n elements from ℤ/p.
+Incredibly, the choice of prime polynomial
+doesn't matter very much: any two finite fields of size
+p<sup>n</sup> have identical structure, even if they give the
+individual elements different names.
+Because of this, it makes sense to refer to all the finite
+fields of size p<sup>n</sup> as one concept: GF(p<sup>n</sup>).
+The GF stands for Galois Field, in honor of Évariste Galois,
+who was the first to study these.
+The exact polynomial chosen to produce a particular
+GF(p<sup>n</sup>) is an implementation detail.
+</p>
+
+<p class="pp">
+For a programmer, the most interesting finite fields
+constructed this way are GF(2<sup>n</sup>)—the polynomial
+extensions of ℤ/2—because
+the elements of GF(2<sup>n</sup>) are bit vectors of length n.
+As a concrete example, consider (ℤ/2)[x]/(x<sup>8</sup>+x<sup>4</sup>+x<sup>3</sup>+x+1) .
+The field has 2<sup>8</sup> elements: each can be
+represented by a single byte.  The byte
+with binary digits b<sub>7</sub>b<sub>6</sub>b<sub>5</sub>b<sub>4</sub>b<sub>3</sub>b<sub>2</sub>b<sub>1</sub>b<sub>0</sub> represents
+the polynomial b<sub>7</sub>·x<sup>7</sup> + b<sub>6</sub>·x<sup>6</sup> + b<sub>5</sub>·x<sup>5</sup> + b<sub>4</sub>·x<sup>4</sup> + b<sub>3</sub>·x<sup>3</sup> + b<sub>2</sub>·x<sup>2</sup> + b<sub>1</sub>·x<sup>1</sup> + b<sub>0</sub>.
+To add polynomials, we add coefficients.
+Since the coefficients are from ℤ/2, adding coefficients
+means XOR'ing each bit position separately,
+which is something computer hardware can do easily.
+Multiplying the polynomials is more difficult,
+because standard multiplication hardware is based
+on adding, but we need a multiplication based on XOR'ing.
+Because the coefficient math wraps
+at 2, (x<sup>2</sup>+x)·(x+1) = x<sup>3</sup>+2x<sup>2</sup>+x = x<sup>3</sup>+x,
+while computer multiplication would choose
+110<sub>2</sub>* 011<sub>2</sub> = 6 * 3 = 18 = 10010<sub>2</sub>.
+However, it turns out that we can implement this
+field multiplication with a simple lookup table.
+In a finite field, there is always at least one
+element α that can serve as a generator.
+All the other non-zero elements are powers of α: α, α<sup>2</sup>, α<sup>3</sup>, and so on.
+This α is not symbolic like x: it's a specific element.
+For example, in ℤ/5, we can use α=2: {α, α<sup>2</sup>, α<sup>3</sup>, α<sup>4</sup>} = {2, 4, 8, 16} = {2, 4, 3, 1}.
+In GF(2<sup>n</sup>) the math is more complex but still works.
+If we know the generator, then we can, by repeated
+multiplication, create a lookup table exp[i] = αⁱ and an
+inverse table log[αⁱ] = i.
+Multiplication is then just a few table lookups:
+assuming a and b are non-zero,
+a·b = exp[log[a]+log[b]].
+(That's a normal integer +, to add the exponents, not an XOR.)
+</p>
+
+<h2>Why do we care?</h2>
+
+<p class="pp">
+The fact that GF(2<sup>n</sup>) can be implemented efficiently
+on a computer means that we can implement systems
+based on mathematical theorems
+without worrying about the usual overflow problems
+you get when modeling integers or real numbers.
+To be sure, GF(2<sup>n</sup>) behaves quite differently from
+the integers in many ways, but if all you need is
+the field axioms, it's good enough,
+and it eliminates any need to worry about
+overflow or arbitrary precision calculations.
+Because of the lookup table, GF(2<sup>8</sup>) is by far the
+most common choice of field in a computer algorithm.
+For example, the Advanced Encryption Standard
+(AES, formerly Rijndael) is built around GF(2<sup>8</sup>) arithmetic,
+as are nearly all implementations of Reed-Solomon coding.
+</p>
+
+<h2>Code</h2>
+
+<p class="lp">
+Let's begin by defining a <code>Field</code> type that will
+represent the specific instance of GF(2<sup>8</sup>) defined by a
+given polynomial.
+The polynomial must be of degree 8, meaning that
+its binary representation has the 0x100 bit set and no
+higher bits set.
+</p>
+
+<pre>type Field struct {
+    ...
+}
+</pre>
+
+<p class="lp">
+Addition is just XOR, no matter what the polynomial is:
+</p>
+
+<pre>// Add returns the sum of x and y in the field.
+func (f *Field) Add(x, y byte) byte {
+    return x ^ y
+}
+</pre>
+
+<p class="lp">
+Multiplication is where things get interesting.
+If you'd used binary (and Go) in grade school, you might have learned
+this algorithm for multiplying two numbers
+(this is <i>not</i> finite field arithmetic):
+</p>
+
+<pre>// Grade-school multiplication in binary: mul returns the product x×y.
+func mul(x, y int) int {
+    z := 0
+    for x &gt; 0 {
+        if x&amp;1 != 0 {
+            z += y
+        }
+        x &gt;&gt;= 1
+        y &lt;&lt;= 1
+    }
+    return z
+}
+</pre>
+
+<p class="lp">
+The running total <code>z</code> accumulates the product of <code>x</code> and <code>y</code>.
+The first iteration of this loop adds <code>y</code> to <code>z</code> if the
+low bit (the 1s digit) of <code>x</code> is 1.
+The next iteration adds <code>y*2</code> if the next bit (the 2s digit, now shifted down) of
+<code>x</code> is 1.
+The next iteration adds <code>y*4</code> if the 4s digit is 1, and so on.
+Each iteration shifts x to the right to chop off the processed digit
+and shifts y to the left to multiply by two.
+</p>
+
+<p class="pp">
+To adapt this to multiply in a finite field, we need to make two changes.
+First, addition is XOR, so we use <code>^=</code> instead of <code>+=</code>
+to add to <code>z</code>.
+Second, we need to make the multiply reduce modulo the polynomial.
+Assuming that the inputs have already been reduced, the only chance
+of exceeding the polynomial comes from the shift of <code>y</code>.
+After the shift, then, we can check to see if we've overflowed, and if so,
+subtract (XOR) out one copy of the polynomial.
+The finite field version, then, is:
+</p>
+
+<pre>// GF(256) mutiplication: mul returns the product x×y mod poly.
+func mul(x, y, poly int) int {
+    z := 0
+    for x &gt; 0 {
+        if x&amp;1 != 0 {
+            z ^= y
+        }
+        x &gt;&gt;= 1
+        y &lt;&lt;= 1
+        if y&amp;0x100 != 0 {
+            y ^= poly
+        }
+    }
+    return z
+}
+</pre>
+
+<p class="lp">We might want to do a lot of multiplication, though,
+and this loop is too slow.  There aren't that many inputs—only 2<sup>8</sup>×2<sup>8</sup> of them—so one
+option is to build a 64kB lookup table.  With some cleverness, we can
+build a smaller lookup table.
+In the <code>NewField</code>
+constructor, we can compute α<sup>0</sup>, α<sup>1</sup>, α<sup>2</sup>, ..., record the sequence
+in an <code>exp</code> array, and record the inverse in
+a <code>log</code> array.
+Then we can reduce multiplication to addition of logarithms,
+like a <a href="http://en.wikipedia.org/wiki/Slide_rule">slide rule</a> does.
+</p>
+
+<pre>// A Field represents an instance of GF(256) defined by a specific polynomial.
+type Field struct {
+    log [256]byte // log[0] is unused
+    exp [510]byte
+}
+
+// NewField returns a new field corresponding to
+// the given polynomial and generator.
+func NewField(poly, α int) *Field {
+    var f Field
+    x := 1
+    for i := 0; i &lt; 255; i++ {
+        f.exp[i] = byte(x)
+        f.exp[i+255] = byte(x)
+        f.log[x] = byte(i)
+        x = mul(x, α, poly)
+    }
+    f.log[0] = 255
+    return &amp;f
+}
+</pre>
+
+<p class="lp">
+The values of the <code>exp</code> function cycle with period 255
+(not 256, because 0 is impossible): α<sup>255</sup> = 1.
+The straightforward way to implement <code>Exp</code>, then,
+is to look up the entry given by the exponent modulo 255.
+</p>
+
+<pre>// Exp returns the base 2 exponential of e in the field.
+// If e &lt; 0, Exp returns 0.
+func (f *Field) Exp(e int) byte {
+    if e &lt; 0 {
+        return 0
+    }
+    return f.exp[e%255]
+}
+</pre>
+
+<p class="lp">
+<code>Log</code> is an even simpler table lookup, because the input
+is only a byte:
+</p>
+
+<pre>// Log returns the base 2 logarithm of x in the field.
+// If x == 0, Log returns -1.
+func (f *Field) Log(x byte) int {
+    if x == 0 {
+        return -1
+    }
+    return int(f.log[x])
+}
+</pre>
+
+<p class="lp">
+<code>Mul</code> is where things get interesting.
+The obvious implementation of <code>Mul</code> is <code>exp[(log[x]+log[y])%255]</code>,
+but if we double the <code>exp</code> array, so that it is 510 elements long,
+we can drop the relatively expensive <code>%255</code>:
+</p>
+
+<pre>// Mul returns the product of x and y in the field.
+func (f *Field) Mul(x, y byte) byte {
+    if x == 0 || y == 0 {
+        return 0
+    }
+    return f.exp[int(f.log[x])+int(f.log[y])]
+}
+</pre>
+
+<p class="lp">
+<code>Inv</code> returns the multiplicative inverse, 1/x.
+We don't implement divide: instead of x/y, we can use x · 1/y.
+</p>
+
+<pre>// Inv returns the multiplicative inverse of x in the field.
+// If x == 0, Inv returns 0.
+func (f *Field) Inv(x byte) byte {
+    if x == 0 {
+        return 0
+    }
+    return f.exp[255-f.log[x]]
+}
+</pre>
+
+<h2>Reed-Solomon Coding</h2>
+
+<p class="lp">In 1960, Irving Reed and Gustave Solomon proposed a way
+to build an error-correcting code using GF(2<sup>n</sup>).
+The method interpreted the m message bits as coefficients of a polynomial f of degree m−1
+over GF(2<sup>n</sup>) and then sent f(0), f(α), f(α<sup>2</sup>), f(α<sup>3</sup>), ..., f(1).
+Any m of these, if received correctly, suffice to reconstruct f,
+and then the message can be read off the coefficients.
+To find a correct set, Reed and Solomon's algorithm constructed the
+f corresponding to every possible subset of m received values
+and then chose the most common one in a majority vote.
+As long as no more than (2<sup>n</sup>−m)/2 values were corrupted
+in transit, the majority will agree on the correct value of f.
+This decoding algorithm is very expensive, too expensive for
+long messages.
+As a result, the Reed-Solomon approach sat unused for
+almost a decade.
+In 1969, however, Elwyn Berlekamp and James Massey
+proposed a variant with an efficient decoding algorithm.
+In the 1980s, Berlekamp and Lloyd Welch developed an
+even more efficient decoding algorithm that is the one typically used today.
+These decoding algorithms are based on
+systems of equations far too complex to explain here;
+in this post, we will only deal with encoding.
+(I can't keep the decoding algorithms straight in my head for more than
+an hour or two at a time, much less explain them in finite space.)
+</p>
+
+<p class="pp">In Reed-Solomon encoding as it is practiced today,
+the choice of finite field F and generator α defines a
+generator polynomial g(x) = (x−1)(x−α)(x−α<sup>2</sup>)...(x−α<sup>n−m</sup>).
+To encode a message m, the message is taken as the
+top coefficients of a degree n polynomial f(x) =
+m<sub>0</sub>x<sup>n−1</sup>+m<sub>1</sub>x<sup>n−2</sup>+...+m<sub>m</sub>x<sup>n−m−1</sup>.
+Then that polynomial can be divided by g to produce the
+remainder polynomial r(x), the unique polynomial of
+degree less than n−m such that f(x) − r(x)
+is a multiple of g(x).
+Since r(x) is of degree less than n−m, subtracting r(x) does not
+affect any of the message coefficients, just the lower terms,
+so the polynomial f(x) − r(x) (= f(x) + r(x)) is taken as the
+encoded message.  All encoded messages, then, are multiples of g(x).
+On the receiving end, the decoder does some magic to figure
+out the simplest changes needed to make the received
+polynomial a multiple of g(x) and then reads the message
+out of the top coefficients.
+</p>
+
+<p class="pp">While decoding is difficult, encoding is easy:
+the first m bytes are the message itself, followed by
+the c bytes defining the remainder of m·x<sup>c</sup>/g(x).
+We can also check whether we received an error-free
+message by checking whether the concatenation
+defines a polynomial that is a multiple of g(x).
+</p>
+
+<h2>Code</h2>
+
+<p class="lp">The Reed-Solomon encoding problem is this: given a message m interpreted as a polynomial m(x), compute the error correction bytes, m(x)·x<sup>c</sup> mod g(x).
+</p>
+
+<p class="pp">The grade-school division algorithm works well here.
+If we fill in <code>p</code> with m(x)·x<sup>c</sup> (m followed by c zero bytes),
+then we can replace <code>p</code> by the remainder by iteratively subtracting out
+multiples of the generator polynomial g.
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    k := f.Mul(p[i], f.Inv(gen[0]))  // k = p<sub>i</sub> / g<sub>0</sub>
+    // p -= k·g
+    for j, g := range gen {
+        p[i+j] = f.Add(p[i+j], f.Mul(k, g))
+    }
+}
+</pre>
+
+<p class="lp">This implementation is correct but can be made
+more efficient.  If you want to try,
+run:
+</p>
+<pre>go get code.google.com/p/rsc/gf256
+go test code.google.com/p/rsc/gf256 -bench Blog
+</pre>
+
+<p class="lp">That benchmark measures
+the speed of the implementation in <code>blog_test.go</code>,
+which looks like the above.  Optimize away, or follow along.
+</p>
+
+<p class="pp">There's definitely room for improvement:</p>
+
+<pre>$ go test code.google.com/p/rsc/gf256 -bench ECC
+PASS
+BenchmarkBlogECC   500000   7031 ns/op   4.55 MB/s
+BenchmarkECC      1000000   1332 ns/op  24.02 MB/s
+</pre>
+
+<p class="lp">
+To start, we can expand the definitions of <code>Add</code> and <code>Mul</code>.
+The Go compiler's inliner would do this for us; the win here is not
+the inlining but the simplifications it will enable us to make.
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    if p[i] == 0 {
+        continue
+    }
+    k := f.exp[f.log[p[i]] + 255 - f.log[gen[0]]]  // k = p<sub>i</sub> / g<sub>0</sub>
+    // p -= k·g
+    for j, g := range gen {
+        p[i+j] ^= f.exp[f.log[k] + f.log[g]]
+    }
+}
+</pre>
+
+<p class="lp">
+(The implementation handles <code>p[i] == 0</code> specially
+because 0 has no log.)
+</p>
+
+<p class="pp">
+The first thing to note is that we compute <code>k</code> but then use
+<code>f.log[k]</code> repeatedly.  Computing the log will avoid that
+memory access, and it is cheaper: we just take out the <code>f.exp[...]</code> lookup
+on the line that computes <code>k</code>.  This is safe because <code>p[i]</code> is non-zero, so <code>k</code> must be non-zero.
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    if p[i] == 0 {
+        continue
+    }
+    lk := f.log[p[i]] + 255 - f.log[gen[0]]  // k = p<sub>i</sub> / g<sub>0</sub>
+    // p -= k·g
+    for j, g := range gen {
+        p[i+j] ^= f.exp[lk + f.log[g]]
+    }
+}
+</pre>
+
+<p class="lp">
+Next, note that we repeatedly compute <code>f.log[g]</code>.  Instead of doing that,
+we can iterate <code>lgen</code>—an array holding the logs of the coefficients—instead of <code>gen</code>.
+We'll have to handle zero somehow: let's say that the array has an entry set to 255
+when the corresponding <code>gen</code> value is zero.
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    if p[i] == 0 {
+        continue
+    }
+    lk := f.log[p[i]] + 255 - f.log[gen[0]]  // k = p<sub>i</sub> / g<sub>0</sub>
+    // p -= k·g
+    for j, lg := range lgen {
+        if lg != 255 {
+            p[i+j] ^= f.exp[lk + lg]
+        }
+    }
+}
+</pre>
+
+<p class="lp">
+Next, we can notice that since the generator is defined as
+</p>
+
+<center>
+g(x) = (x−1)(x−α)(x−α<sup>2</sup>)...(x−α<sup>n−m</sup>)
+</center>
+
+<p class="lp">
+the first coefficient, g<sub>0</sub>, is always 1!
+That means we can simplify the k = p<sub>i</sub> / g calculation
+to just k = p<sub>i</sub>.  Also, we can drop the first element of lgen
+and its subtraction, as long as we ignore the high bytes in the result
+(we know they're supposed to be zero anyway).
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    if p[i] == 0 {
+        continue
+    }
+    lk := f.log[p[i]]
+    // p -= k·g
+    for j, lg := range lgen {
+        if lg != 255 {
+            p[i+1+j] ^= f.exp[lk + lg]
+        }
+    }
+}
+</pre>
+
+<p class="lp">
+The inner loop, which is where we spend all our time, has two
+additions by loop-invariant constants: <code>i+1+j</code> and <code>lk+lg</code>.
+The <code>i+1</code> and <code>lk</code> do not change on each iteration.
+We can avoid those additions by reslicing the arrays
+outside the loop:
+</p>
+
+<pre>for i := 0; i &lt; len(m); i++ {
+    if p[i] == 0 {
+        continue
+    }
+    lk := f.log[p[i]]
+    // p -= k·g
+    q := p[i+1:]
+    exp := f.exp[lk:]
+    for j, lg := range lgen {
+        if lg != 255 {
+            q[j] ^= exp[lg]
+        }
+    }
+}
+</pre>
+
+<p class="lp">As one final trick, we can replace <code>p[i]</code> by a range variable.
+The Go compiler does not yet use
+loop invariants to eliminate bounds checks, but it does eliminate
+bounds checks in the implicit indexing done by a range loop.
+</p>
+
+<pre>for i, pi := range p {
+    if i == len(m) {
+        break
+    }
+    if pi == 0 {
+        continue
+    }
+    // p -= k·g
+    q := p[i+1:]
+    exp := f.exp[f.log[pi]:]
+    for j, lg := range lgen {
+        if lg != 255 {
+            q[j] ^= exp[lg]
+        }
+    }
+}
+</pre>
+
+<p class="lp">
+The code is in context in
+<a href="http://code.google.com/p/rsc/source/browse/gf256/gf256.go#120">gf256.go</a>.
+</p>
+
+<h2>Summary</h2>
+
+<p class="lp">
+We started with single bits 0 and 1.
+From those we constructed 8-bit polynomials—the elements
+of GF(2<sup>8</sup>)—with overflow-free, easy-to-implement
+mathematical operations.
+From there we moved on to Reed-Solomon coding,
+which constructs its own polynomials built using
+elements of GF(2<sup>8</sup>) as coefficients.
+That is, each Reed-Solomon message is interpreted
+as a polynomial, and each coefficient in that polynomial
+is itself a smaller polynomial.
+</p>
+
+<p class="pp">
+Now that we know how to create Reed-Solomon encodings, the next post
+will look at some fun we can have with them.
+</p>
+
+      </div>
+    </div>
+  
+
+
+
+
+
+
+
+
+</body></html>
