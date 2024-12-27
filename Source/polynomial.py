@@ -2,10 +2,20 @@
 # -*- coding: utf-8 -*-
 
 """
+This file contains the Polynomial class, the basic object for use in coordination with Galois fields,
+and together with the Reed-Solomon corrector code. This class was inspired by the attributes and
+initialization of the Polynomial class in this project's polynomial.py file:
+https://github.com/lrq3000/unireedsolomon.
 
+In addition to implementing the algorithms required for the Reed-Solomon code, it has been given
+additional functionality taken from first-grade courses, so don't worry if it seems both simple
+and complicated !
 """
 
 from typing import Iterable, Iterator, Self, Any
+
+import sympy as sp
+from fractions import Fraction
 
 
 class PolynomialError(Exception):
@@ -103,7 +113,12 @@ class Polynomial:
     @property
     def delta(self) -> int | float:
         if self._degree() == 2:
-            return self.b**2 - 4 * self.a * self.c
+            a, b, c = sp.symbols("a b c")
+
+            result = sp.simplify(b**2 - 4 * a * c)
+            result = result.subs({a: self.a, b: self.b, c: self.c})
+
+            return result.evalf()
 
         else:
             raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")

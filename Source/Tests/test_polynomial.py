@@ -2,6 +2,14 @@
 
 import unittest
 
+import sys
+import os
+
+# Add the path of the parent repertory to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.append(parent_dir)
+
 from polynomial import Polynomial
 
 
