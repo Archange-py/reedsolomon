@@ -233,6 +233,11 @@ class TestPolynomial(unittest.TestCase):
 
         self.assertEqual(sh, _sh)
 
+    def test_solve_equation_1(self):
+        f = Polynomial(2, -26)
+
+        self.assertEqual(f.solve(), 13.0)
+
     def test_solve_2_roots_equation_1(self):
         f = Polynomial(1, 1, -12)
 
@@ -244,6 +249,15 @@ class TestPolynomial(unittest.TestCase):
 
         self.assertEqual(h.delta, 0)
         self.assertTupleEqual(h.solve(), (1.6666666666666667,))
+
+    def test_solve_equation_2(self):
+        f = Polynomial(x5=3, x2=23, x0=14)
+
+        self.assertTupleEqual(f.solve(), ((-2.061777647931321+0j),
+                                          (-0.023547692027920532-0.7769582400529271j),
+                                          (-0.023547692027920532+0.7769582400529271j),
+                                          (1.054436515993581-1.6230188809835164j),
+                                          (1.054436515993581+1.6230188809835164j)))
 
     def test_expression_developped_1(self):
         f = Polynomial(1, 1, -12)

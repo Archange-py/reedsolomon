@@ -409,26 +409,30 @@ class Polynomial:
 
         return items
 
-    def solve(self) -> tuple[float | None]:
-        if self.degree == 2:
-            delta = self.delta
+    def solve(self) -> tuple[float]:
+        delta = self.delta if self.degree == 2 else None
 
-            if delta > 0:
-                solutions = [(-self.b - delta**0.5) / (2 * self.a), (-self.b + delta**0.5) / (2 * self.a)]
+        if self.degree == 1:
+            return (-self.b / self.a)
 
-                if solutions[0] > solutions[1]:
-                    solutions[0], solutions[1] = solutions[1], solutions[0]
+        elif self.degree == 2 and delta > 0:
+            solutions = [(-self.b - delta**0.5) / (2 * self.a), (-self.b + delta**0.5) / (2 * self.a)]
 
-                return tuple(solutions)
+            if solutions[0] > solutions[1]:
+                solutions[0], solutions[1] = solutions[1], solutions[0]
 
-            elif delta == 0:
-                return tuple([-self.b / (2 * self.a)])
+            return tuple(solutions)
 
-            else:
-                return ()
+        elif self.degree == 2 and delta == 0:
+            return tuple([-self.b / (2 * self.a)])
 
         else:
-            raise PolynomialError("For the moment, only implemented for 2nd degree equations.")
+            x = sp.symbols("x")
+
+            expression = eval(" + ".join(str(value) + " * x**" + _x[1:] for _x, value in self.items()), {"x":x})
+            solutions = tuple(complex(sol.evalf()) for sol in sp.solve(expression))
+
+            return solutions
 
     def developped(self) -> str:
         string = " + ".join(str(self.sparse[x]) + "x^" + x[1:] for x, _ in self.items() if self.sparse[x] != 0)
