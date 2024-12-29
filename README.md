@@ -4,7 +4,7 @@ Image generated with DALL-E
 
 # Reed-Solomon Codes Implementation
 
-Welcome to the **Reed-Solomon codes** GitHub repository! This project is dedicated to exploring the fascinating world of error-correcting codes, particularly the widely-used Reed-Solomon codes. These codes are crucial in ensuring data integrity in digital communication and storage systems.
+Welcome to the **Reed-Solomon codes** GitHub repository! This project is dedicated to exploring Reed-Solomon codes. These codes are crucial in ensuring data integrity in digital communication and storage systems.
 
 ## Table of Contents
 ***
