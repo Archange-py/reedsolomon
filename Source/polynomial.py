@@ -15,7 +15,6 @@ and complicated !
 from typing import Iterable, Iterator, Self, Any
 
 import sympy as sp
-from fractions import Fraction
 
 
 class PolynomialError(Exception):
@@ -56,15 +55,7 @@ class Polynomial:
     def coefficients(self) -> list[int]:
         x = [coef for _, coef in self.items()]
 
-        n = 0
-        for coef in x:
-            if not coef:
-                n += 1
-
-            else:
-                break
-
-        return x[n:]
+        return x[self._position_end_zeros(x):]
 
     @coefficients.setter
     def coefficients(self, _coef: Iterable):
@@ -78,14 +69,7 @@ class Polynomial:
     def sparse(self) -> dict[str, int]:
         items = list(self._sparse.items())
         items.sort(key= lambda x: int(x[0][1:]), reverse=True)
-
-        n = 0
-        for _, value in items:
-            if not value:
-                n += 1
-
-            else:
-                break
+        n = self._position_end_zeros([value for _, value in items])
 
         self._sparse = dict(items[n:])
         return self._sparse
@@ -99,7 +83,7 @@ class Polynomial:
         raise PolynomialError("You can't delete sparse attribute.")
 
     @property
-    def degree(self) -> dict[str, int]:
+    def degree(self) -> int:
         return self._degree()
 
     @degree.setter
@@ -111,17 +95,17 @@ class Polynomial:
         raise PolynomialError("You can't delete degree attribute.")
 
     @property
-    def delta(self) -> int | float:
+    def delta(self) -> float:
         if self._degree() == 2:
             a, b, c = sp.symbols("a b c")
 
             result = sp.simplify(b**2 - 4 * a * c)
             result = result.subs({a: self.a, b: self.b, c: self.c})
 
-            return result.evalf()
+            return float(result.evalf())
 
         else:
-            raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")
+            raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     @delta.setter
     def delta(self, _):
@@ -131,14 +115,13 @@ class Polynomial:
     def delta(self):
         raise PolynomialError("You can't delete delta attribute.")
 
-
     @property
     def alpha(self) -> int | float:
         if self._degree() == 2:
             return -self.b / (2 * self.a)
 
         else:
-            raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")
+            raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     @alpha.setter
     def alpha(self, _):
@@ -154,7 +137,7 @@ class Polynomial:
             return (4 * self.a * self.c - self.b**2) / 4 * self.a
 
         else:
-            raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")
+            raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     @beta.setter
     def beta(self, _):
@@ -189,7 +172,7 @@ class Polynomial:
                     assert i == _x
 
             except AssertionError:
-                raise PolynomialError(f"Polynomial must has coefficients in this order: self._degree(), ..., 2, 1, 0.")
+                raise PolynomialError(f"Polynomial must has coefficients in this order: self.degree, ..., 2, 1, 0.")
 
             return self.sparse["x" + str(len(dico) - dico.index(x) - 1)]
 
@@ -238,6 +221,12 @@ class Polynomial:
     def __iter__(self) -> Iterator:
         return iter(self.coefficients)
 
+    def __reversed__(self) -> list[int | float]:
+        coefficients = self.coefficients
+        coefficients.reverse()
+
+        return coefficients[self._position_end_zeros(coefficients):]
+
     def __contains__(self, x: str) -> bool:
         if not (len(x) > 1 and x[0] == "x" and x[1:].isdigit()):
             raise PolynomialError(f"{x} must be follow this exact syntax: 'x' + int.")
@@ -251,7 +240,7 @@ class Polynomial:
         return eval(string)
 
     def __str__(self) -> str:
-        return f"{self.name}(x) = {self.devellopped()}"
+        return f"{self.name}(x) = {self.developped()}"
 
     def __repr__(self) -> str:
         string = ", ".join(x + "=" + str(v) for x, v in self.items())
@@ -349,7 +338,23 @@ class Polynomial:
     __rsub__ = __isub__ = __sub__
 
     def __mul__(self, other: Self | (int | float)) -> Self:
-        if isinstance(other, (int, float)):
+        if isinstance(other, Polynomial):
+            liste, n = [], 0
+
+            for i in range(self.degree, -1, -1):
+                if self[i]:
+                    liste.append(Polynomial())
+                    for j in range(other.degree, -1, -1):
+                        liste[n][i + j] = self[i] * other[j]
+
+                else:
+                    continue
+
+                n += 1
+
+            return sum(liste)
+
+        elif isinstance(other, (int, float)):
             return Polynomial(**{x:value * other for x, value in self.items()})
 
         else:
@@ -387,35 +392,53 @@ class Polynomial:
     def _degree(self) -> int:
         return max([int(x[1:]) for x in self.sparse.keys()])
 
+    def _position_end_zeros(self, iterable: Iterable) -> int:
+        n = 0
+        for x in iterable:
+            if not x:
+                n += 1
+
+            else:
+                break
+
+        return n
+
     def items(self) -> list[tuple]:
         items = list(self.sparse.items())
         items.sort(key= lambda x: int(x[0][1:]), reverse=True)
 
         return items
 
-    def solve(self) -> tuple[int |float] | None:
-        delta = self.delta
+    def solve(self) -> tuple[float | None]:
+        if self.degree == 2:
+            delta = self.delta
 
-        if delta > 0:
-            solutions = [(-self.b - delta**0.5) / (2 * self.a), (-self.b + delta**0.5) / (2 * self.a)]
+            if delta > 0:
+                solutions = [(-self.b - delta**0.5) / (2 * self.a), (-self.b + delta**0.5) / (2 * self.a)]
 
-            if solutions[0] > solutions[1]:
-                solutions[0], solutions[1] = solutions[1], solutions[0]
+                if solutions[0] > solutions[1]:
+                    solutions[0], solutions[1] = solutions[1], solutions[0]
 
-            return tuple(solutions)
+                return tuple(solutions)
 
-        elif delta == 0:
-            return tuple([-self.b / (2 * self.a)])
+            elif delta == 0:
+                return tuple([-self.b / (2 * self.a)])
+
+            else:
+                return ()
 
         else:
-            return None
+            raise PolynomialError("For the moment, only implemented for 2nd degree equations.")
 
-    def devellopped(self) -> str:
+    def developped(self) -> str:
         string = " + ".join(str(self.sparse[x]) + "x^" + x[1:] for x, _ in self.items() if self.sparse[x] != 0)
-        string = string.replace("+ -", "- ").replace("x^1 ", "x ").replace("x^0", "").replace(" 1x", " x").replace("-1x", "-x").replace("-1x^", "-x^").replace("x^2 ", "x² ")
+        string = string.replace("+ -", "- ").replace("x^1 ", "x ").replace("x^0", "").replace(" 1x", " x").replace("-1x", "-x").replace("x^2 ", "x² ")
 
         if string.endswith("^1"):
             string = string[:len(string) - 2]
+
+        if string.startswith("1x"):
+            string = string[1:]
 
         if not string:
             string = "0"
@@ -423,17 +446,20 @@ class Polynomial:
         return string
 
     def canonic(self, decimal: int = 3) -> str:
-        if self._degree() == 2:
+        if self.degree == 2:
             string = f"{self.a}(x - {round(self.alpha, decimal)})² + {round(self.beta, decimal)}"
-            string = string.replace("- -", "+ ").replace("+ -", "- ").replace("1(", "(").replace("-1(", "-(").replace("² + 0", "").replace("² - 0", "")
+            string = string.replace("- -", "+ ").replace("+ -", "- ").replace("-1(", "-(").replace("² + 0", "").replace("² - 0", "")
+
+            if string.startswith("1("):
+                string = string[1:]
 
             return string
 
         else:
-            raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")
+            raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     def factorised(self, decimal: int = 3) -> str:
-        if self._degree() == 2:
+        if self.degree == 2:
             solutions = self.solve()
 
             if solutions is None:
@@ -441,16 +467,19 @@ class Polynomial:
 
             elif len(solutions) == 1:
                 string = f"{self.a}(x - {round(solutions[0], decimal)})²"
-                string = string.replace("- -", "+ ").replace("1(", "(").replace("-1(", "-(")
 
             elif len(solutions) == 2:
                 string = f"{self.a}(x - {round(solutions[0], decimal)})(x - {round(solutions[1], decimal)})"
-                string = string.replace("- -", "+ ").replace("1(", "(").replace("-1(", "-(")
+
+            string = string.replace("- -", "+ ").replace("-1(", "-(")
+
+            if string.startswith("1("):
+                string = string[1:]
 
             return string
 
         else:
-            raise NotImplementedError("For the moment, only implemented for 2nd _degree equations.")
+            raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     def derive(self) -> Self:
         L = len(self)-1

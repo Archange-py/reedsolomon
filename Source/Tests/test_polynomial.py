@@ -170,6 +170,21 @@ class TestPolynomial(unittest.TestCase):
 
         self.assertEqual(f(0), -67)
 
+    def test_tips_list_1(self):
+        f = Polynomial(0, -3, 23, -67, 0)
+
+        self.assertListEqual(list(f), [-3, 23, -67, 0])
+
+    def test_tips_reversed_1(self):
+        f = Polynomial(0, -3, 23, -67, 0)
+
+        self.assertListEqual(list(reversed(f)), [-67, 23, -3])
+
+    def test_tips_dict_1(self):
+        f = Polynomial(0, -3, 23, -67, 0)
+
+        #self.assertDictEqual(dict(f), {"x3":-3, "x2":23, "x1":-67, "x0":0})
+
     def test_degree_1(self):
         f = Polynomial(-3, 23, -67)
 
@@ -230,11 +245,10 @@ class TestPolynomial(unittest.TestCase):
         self.assertEqual(h.delta, 0)
         self.assertTupleEqual(h.solve(), (1.6666666666666667,))
 
-
-    def test_expression_devellopped_1(self):
+    def test_expression_developped_1(self):
         f = Polynomial(1, 1, -12)
 
-        self.assertEqual(f.devellopped(), "1x² + x - 12")
+        self.assertEqual(f.developped(), "x² + x - 12")
 
     def test_expression_canonic_1(self):
         f = Polynomial(1, 1, -12)
@@ -339,6 +353,24 @@ class TestPolynomial(unittest.TestCase):
         h.name = "h"
 
         self.assertEqual(str(h), "h(x) = 105x^5 - 9x² + 3")
+
+    def test_mul_2(self):
+        f = Polynomial(x5=35, x2=-3, x0=1)
+        g = Polynomial(21, 5, -1, name="g")
+
+        h = f * g
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 735x^7 + 175x^6 - 35x^5 - 63x^4 - 15x^3 + 24x² + 5x - 1")
+
+    def test_mul_3(self):
+        i = Polynomial(x5=1, x2=1, x0=1)
+        j = Polynomial(x2=1, x1=1, x0=1)
+
+        h = i * j
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = x^7 + x^6 + x^5 + x^4 + x^3 + 2x² + x + 1")
 
     def test_div_1(self):
         f = Polynomial(x5=35, x2=-3, x0=1)
