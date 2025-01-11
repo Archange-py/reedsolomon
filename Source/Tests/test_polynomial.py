@@ -388,13 +388,101 @@ class TestPolynomial(unittest.TestCase):
 
     def test_div_1(self):
         f = Polynomial(x5=35, x2=-3, x0=1)
-        g = Polynomial(21, 5, -1, name="g")
 
         h = f / 2
         h.name = "h"
 
         self.assertEqual(str(h), "h(x) = 17.5x^5 - 1.5x² + 0.5")
 
+        f = Polynomial(2, 3, -1, 5)
+
+        h = f / 2
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
+
+    def test_div_2(self):
+        f = Polynomial(2, 3, -1, 5)
+        g = Polynomial(1, 0, 1, name="g")
+
+        h = f / g
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 2x + 3")
+
+    def test_floor_division_1(self):
+        f = Polynomial(2, 3, -1, 5)
+        g = Polynomial(1, 0, 1, name="g")
+
+        h = f // 2
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
+
+        h = f // g
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 2x + 3")
+
+    def test_modulo_1(self):
+        f = Polynomial(2, 3, -1, 5)
+        g = Polynomial(1, 0, 1, name="g")
+
+        h = f % 2
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 0")
+
+        h = f % g
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = -3x + 2")
+
+    def test_divmod_1(self):
+        f = Polynomial(2, 3, -1, 5)
+        g = Polynomial(1, 0, 1, name="g")
+
+        quotient, remainder = divmod(f, g)
+
+        self.assertEqual(quotient, Polynomial(x1=2.0, x0=3.0))
+        self.assertEqual(remainder, Polynomial(x1=-3.0, x0=2.0))
+
+        h = Polynomial(2, 3) * Polynomial(1, 0, 1) + Polynomial(-3, 2)
+        h.name = "h"
+
+        self.assertEqual(f, h)
+
+    def test_pow_1(self):
+        f = Polynomial(5, -3, 1)
+
+        h = f**2
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 25x^4 - 30x^3 + 19x² - 6x + 1")
+
+        h = f**3
+        h.name = "h"
+
+        self.assertEqual(str(h), "h(x) = 125x^6 - 225x^5 + 210x^4 - 117x^3 + 42x² - 9x + 1")
+
+        f **= 3
+
+        self.assertEqual(f, h)
+
+    def test_bool_1(self):
+        f = Polynomial(5, -3, 1)
+
+        self.assertTrue(f)
+
+        h = Polynomial()
+
+        self.assertFalse(h)
+
+    def test_int_1(self):
+        f = Polynomial(5, -3, 1)
+
+        self.assertEqual(int(f), 2)
+        self.assertEqual(f.degree, 2)
 
 if __name__ == '__main__':
     unittest.main()

@@ -77,6 +77,8 @@ class Polynomial:
         else:
             self._sparse = sparse
 
+        self._checkfloat()
+
     @property
     def coefficients(self) -> list[int | float]:
         """The list of coefficients, including null coefficients"""
@@ -208,8 +210,8 @@ class Polynomial:
             else:
                 raise PolynomialError(f"{x} must be follow this exact syntax: 'x' + int.")
 
-        elif x in Polynomial._dictionnary and self._degree() <= 27:
-            dico = Polynomial._dictionnary[:self._degree() + 1]
+        elif x in self.__class__._dictionnary and self._degree() <= 27:
+            dico = self.__class__._dictionnary[:self._degree() + 1]
 
             if x not in dico:
                 raise PolynomialError(f"{x} must be in this list: {", ".join(list(dico))}")
@@ -239,10 +241,12 @@ class Polynomial:
         if isinstance(value, (int, float)):
             if len(x) > 1 and x[0] == "x" and x[1:].isdigit():
                 self.sparse[x] = value
+                self._checkfloat()
 
-            elif x in Polynomial._dictionnary and self._degree() <= 27:
-                dico: str = Polynomial._dictionnary[:self._degree() + 1]
+            elif x in self.__class__._dictionnary and self._degree() <= 27:
+                dico: str = self.__class__._dictionnary[:self._degree() + 1]
                 self.sparse["x" + str(len(dico) - dico.index(x) - 1)] = value
+                self._checkfloat()
 
         else:
             super().__setattr__(x, value)
@@ -256,8 +260,8 @@ class Polynomial:
         if len(x) > 1 and x[0] == "x" and x[1:].isdigit():
             del self.sparse[x]
 
-        elif x in Polynomial._dictionnary and self._degree() <= 27:
-            dico: str = Polynomial._dictionnary[:self._degree() + 1]
+        elif x in self.__class__._dictionnary and self._degree() <= 27:
+            dico: str = self.__class__._dictionnary[:self._degree() + 1]
             del self.sparse["x" + str(len(dico) - dico.index(x) - 1)]
 
         else:
@@ -286,6 +290,7 @@ class Polynomial:
             value (int): The new value.
         """
         self.sparse["x" + str(x)] = value
+        self._checkfloat()
 
     def __delitem__(self, x: int):
         """In the manner of a list, del the input degree.
@@ -327,6 +332,10 @@ class Polynomial:
 
         return x in self.sparse.keys()
 
+    def __bool__(self) -> bool:
+        """Detreminate if the polynomial is not null"""
+        return bool(len(self.coefficients))
+
     def __call__(self, x: int | float) -> int | float:
         """Method used to give a mathematical notation when calling a function, such as f(6), or f(-1).
 
@@ -340,6 +349,9 @@ class Polynomial:
         string = string.replace("+ -", "- ").replace("x^1 ", "x").replace("x^0", "").replace("1x", "x")
 
         return eval(string)
+
+    def __int__(self) -> int:
+        return self.degree
 
     def __str__(self) -> str:
         """Returns the expanded form of the function"""
@@ -357,7 +369,7 @@ class Polynomial:
 
     def __eq__(self, other: Self) -> bool:
         """Tests whether two polynomials are equal by comparing their internal sparse dictionary"""
-        if isinstance(other, Polynomial):
+        if isinstance(other, self.__class__):
             return self.sparse == other.sparse
 
         else:
@@ -365,7 +377,7 @@ class Polynomial:
 
     def __ne__(self, other: Self) -> bool:
         """Tests whether two polynomials are not equal by comparing their internal sparse dictionary."""
-        if isinstance(other, Polynomial):
+        if isinstance(other, self.__class__):
             return self.sparse != other.sparse
 
         else:
@@ -373,8 +385,8 @@ class Polynomial:
 
     def __add__(self, other: Self | (int | float)) -> Self:
         """Adds two polynomials or a polynomial and a number"""
-        if isinstance(other, Polynomial):
-            P = Polynomial(name=self.name)
+        if isinstance(other, self.__class__):
+            P = self.__class__(name=self.name)
 
             for x, value in self.items():
                 if other.sparse.get(x) is None:
@@ -410,8 +422,8 @@ class Polynomial:
 
     def __sub__(self, other: Self | (int | float)) -> Self:
         """Subs two polynomials or a polynomial and a number."""
-        if isinstance(other, Polynomial):
-            P = Polynomial(name=self.name)
+        if isinstance(other, self.__class__):
+            P = self.__class__(name=self.name)
 
             for x, value in self.items():
                 if other.sparse.get(x) is None:
@@ -447,12 +459,12 @@ class Polynomial:
 
     def __mul__(self, other: Self | (int | float)) -> Self:
         """Muls two polynomials or a polynomial and a number."""
-        if isinstance(other, Polynomial):
+        if isinstance(other, self.__class__):
             liste, n = [], 0
 
             for i in range(self.degree, -1, -1):
                 if self[i]:
-                    liste.append(Polynomial())
+                    liste.append(self.__class__())
                     for j in range(other.degree, -1, -1):
                         liste[n][i + j] = self[i] * other[j]
 
@@ -464,7 +476,7 @@ class Polynomial:
             return sum(liste)
 
         elif isinstance(other, (int, float)):
-            return Polynomial(**{x:value * other for x, value in self.items()})
+            return self.__class__(**{x:value * other for x, value in self.items()})
 
         else:
             raise NotImplementedError
@@ -472,14 +484,95 @@ class Polynomial:
     __rmul__ = __imul__ = __mul__
 
     def __truediv__(self, other: Self | (int | float)) -> Self:
-        """Divs it's self and a number."""
+        """Divs it's self and a number or a polynomial."""
         if isinstance(other, (int, float)):
+            if not other:
+                raise ZeroDivisionError("You can't divide a polynomial by zero.")
+
             return self.__mul__(other**-1)
+
+        elif isinstance(other, self.__class__):
+            return self.__floordiv__(other)
 
         else:
             raise NotImplementedError
 
     __rtruediv__ = __itruediv__ = __truediv__
+
+    def __floordiv__(self, other: Self | (int | float)) -> Self:
+        """Return the quotient if the divison is between two polynomial, or the result of a normal division."""
+        if isinstance(other, self.__class__):
+            return divmod(self, other)[0]
+
+        elif isinstance(other, (int, float)):
+            return self.__truediv__(other)
+
+        else:
+            raise NotImplementedError
+
+    __rfloordiv__ = __ifloordiv__ = __floordiv__
+
+    def __mod__(self, other: Self | (int | float)) -> Self:
+        """Return the remainder if the divison is between two polynomial, or a null polynomial."""
+        if isinstance(other, self.__class__):
+            return divmod(self, other)[1]
+
+        elif isinstance(other, (int, float)):
+            return self.__class__()
+
+        else:
+            raise NotImplementedError
+
+    __rmod__ = __imod__ = __mod__
+
+    def __divmod__(self, other: Self | (int | float)) -> Self:
+        """Return the quotient and the remainder."""
+        if isinstance(other, self.__class__):
+            if not other:
+                raise ZeroDivisionError("You can't divide a polynomial by an other null polynomial.")
+
+            elif self.degree < other.degree:
+                raise PolynomialError("The degree of the divisor mut be lower than the dividend")
+
+            else:
+                msg_out = list(self.copy())
+                other = list(other)
+                normalizer = other[0]
+
+                for i in range(len(self) - (len(other)-1)):
+                    msg_out[i] /= normalizer
+                    coef = msg_out[i]
+                    if coef != 0:
+                        for j in range(1, len(other)):
+                            if other[j] != 0:
+                                msg_out[i + j] += -other[j] * coef
+
+                separator = -(len(other)-1)
+                return self.__class__(msg_out[:separator]), self.__class__(msg_out[separator:])
+
+        elif isinstance(other, (int, float)):
+            return self / other
+
+        else:
+            raise NotImplementedError
+
+    def __pow__(self, other: int) -> Self:
+        """Implemented the power of a polynomial, with a positive integer"""
+        if isinstance(other, int) and other >= 0:
+            P = self.copy()
+
+            for _ in range(other - 1):
+                P *= self
+
+            return P
+
+        else:
+            raise NotImplementedError("The power must be a positive and an integer number.")
+
+    __ipow__ = __pow__
+
+    def __invert__(self) -> Self:
+        print("invert")
 
     def __neg__(self) -> Self:
         """Multiply the polynomial by -1"""
@@ -498,14 +591,18 @@ class Polynomial:
 
     def copy(self) -> Self:
         """Copy the polynomial"""
-        P = Polynomial(name=self.name)
+        P = self.__class__(name=self.name)
         P._init(sparse=self.sparse)
 
         return P
 
     def _degree(self) -> int:
         """Returns the updated degree of the polynomial"""
-        return max([int(x[1:]) for x in self.sparse.keys()])
+        if self.coefficients:
+            return max([int(x[1:]) for x in self.sparse.keys()])
+
+        else:
+            return 0
 
     def _position_end_zeros(self, iterable: Iterable) -> int:
         """From the list of coefficients, return the position furthest to
@@ -526,6 +623,20 @@ class Polynomial:
                 break
 
         return n
+
+    def _checkfloat(self):
+        """A function to change float coefficient in integers, when it's possible, and update the coefficients attribute."""
+        for i in range(self.degree, -1, -1):
+            coef: int = self[i]
+
+            if coef:
+                n = str(coef).find('.')
+
+                if (len(str(coef)[n:]) == 2 and not int(str(coef)[-1])) or n == -1:
+                   self._sparse["x" + str(i)] = int(coef)
+
+                else:
+                    self._sparse["x" + str(i)] = coef
 
     def items(self) -> list[tuple]:
         """Returns sparse but ordoned dictionary items in descending order"""
@@ -638,4 +749,4 @@ class Polynomial:
     def derive(self) -> Self:
         """Returns the derivative of the polynomial"""
         L = len(self)-1
-        return Polynomial([(L-i) * self[i] for i in range(L)])
+        return self.__class__([(L-i) * self[i] for i in range(L)])
