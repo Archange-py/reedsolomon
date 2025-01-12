@@ -14,8 +14,11 @@ and complicated !
 
 from typing import Iterable, Iterator, Self, Any
 
-import sympy as sp
+try:
+    sp = __import__("sympy")
 
+except ImportError:
+    sp = None
 
 class PolynomialError(Exception):
     """Base class for handling polynomial errors"""
@@ -82,9 +85,13 @@ class Polynomial:
     @property
     def coefficients(self) -> list[int | float]:
         """The list of coefficients, including null coefficients"""
-        x = [coef for _, coef in self.items()]
+        x: list = [coef for _, coef in self.items()]
+        x = x[self._position_end_zeros(x):]
 
-        return x[self._position_end_zeros(x):]
+        if not x:
+            x.append(0)
+
+        return x
 
     @coefficients.setter
     def coefficients(self, _coef: Iterable):
@@ -130,13 +137,16 @@ class Polynomial:
     def delta(self) -> float:
         """Polynomial discriminant, only available for second-degree
         polynomials, otherwise returns an error. Result of b² - 4ac"""
-        if self._degree() == 2:
+        if self.degree == 2 and sp:
             a, b, c = sp.symbols("a b c")
 
             result = sp.simplify(b**2 - 4 * a * c)
             result = result.subs({a: self.a, b: self.b, c: self.c})
 
             return float(result.evalf())
+
+        elif self.degree == 2 and not sp:
+            return self.b**2 - 4 * self.a * self.c
 
         else:
             raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
@@ -334,7 +344,7 @@ class Polynomial:
 
     def __bool__(self) -> bool:
         """Detreminate if the polynomial is not null"""
-        return bool(len(self.coefficients))
+        return not (len(self.coefficients) == 1 and not self.coefficients[0])
 
     def __call__(self, x: int | float) -> int | float:
         """Method used to give a mathematical notation when calling a function, such as f(6), or f(-1).
@@ -359,8 +369,8 @@ class Polynomial:
 
     def __repr__(self) -> str:
         """Returns the formal form of the function"""
-        string = ", ".join(x + "=" + str(v) for x, v in self.items())
-        string = string.replace("x1=", "x=").replace("x0=", "").replace(", 0", "")
+        string = ", ".join(x + "=" + str(v) for x, v in self.items() if v != 0)
+        string = string.replace("x1=", "x=").replace("x0=", "")
 
         if not string:
             string = "0"
@@ -510,7 +520,7 @@ class Polynomial:
         else:
             raise NotImplementedError
 
-    __rfloordiv__ = __ifloordiv__ = __floordiv__
+    __ifloordiv__ = __floordiv__
 
     def __mod__(self, other: Self | (int | float)) -> Self:
         """Return the remainder if the divison is between two polynomial, or a null polynomial."""
@@ -523,8 +533,6 @@ class Polynomial:
         else:
             raise NotImplementedError
 
-    __rmod__ = __imod__ = __mod__
-
     def __divmod__(self, other: Self | (int | float)) -> Self:
         """Return the quotient and the remainder."""
         if isinstance(other, self.__class__):
@@ -532,7 +540,7 @@ class Polynomial:
                 raise ZeroDivisionError("You can't divide a polynomial by an other null polynomial.")
 
             elif self.degree < other.degree:
-                raise PolynomialError("The degree of the divisor mut be lower than the dividend")
+                return (self.__class__(), self.copy())
 
             else:
                 msg_out = list(self.copy())
@@ -572,7 +580,7 @@ class Polynomial:
     __ipow__ = __pow__
 
     def __invert__(self) -> Self:
-        print("invert")
+        raise NotImplementedError
 
     def __neg__(self) -> Self:
         """Multiply the polynomial by -1"""
@@ -598,11 +606,11 @@ class Polynomial:
 
     def _degree(self) -> int:
         """Returns the updated degree of the polynomial"""
-        if self.coefficients:
-            return max([int(x[1:]) for x in self.sparse.keys()])
+        if len(self.coefficients) == 1 and not self.coefficients[0]:
+            return 0
 
         else:
-            return 0
+            return max([int(x[1:]) for x in self.sparse.keys()])
 
     def _position_end_zeros(self, iterable: Iterable) -> int:
         """From the list of coefficients, return the position furthest to
@@ -663,13 +671,16 @@ class Polynomial:
         elif self.degree == 2 and delta == 0:
             return tuple([-self.b / (2 * self.a)])
 
-        else:
+        elif sp:
             x = sp.symbols("x")
 
             expression = eval(" + ".join(str(value) + " * x**" + _x[1:] for _x, value in self.items()), {"x":x})
             solutions = tuple(complex(sol.evalf()) for sol in sp.solve(expression))
 
             return solutions
+
+        else:
+            raise PolynomialError("Solve an equation greater than the 2nd degree isn't implemented. Please install the 'sympy' libray if you want to solve them.")
 
     def developped(self) -> str:
         """Returns the function's expanded form"""

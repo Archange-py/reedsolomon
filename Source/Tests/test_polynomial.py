@@ -410,6 +410,51 @@ class TestPolynomial(unittest.TestCase):
 
         self.assertEqual(str(h), "h(x) = 2x + 3")
 
+    def test_div_3(self):
+        one = Polynomial([1,4,0,3])
+        two = Polynomial([1,0,1])
+
+        q, r = divmod(one, two)
+        self.assertEqual(q, one // two)
+        self.assertEqual(r, one % two)
+
+        self.assertEqual(q.coefficients, [1,4])
+        self.assertEqual(r.coefficients, [-1,-1])
+
+    def test_div_4(self):
+        one = Polynomial([1,0,0,2,2,0,1,2,1])
+        two = Polynomial([1,0,-1])
+
+        q, r = divmod(one, two)
+        self.assertEqual(q, one // two)
+        self.assertEqual(r, one % two)
+
+        self.assertEqual(q.coefficients, [1,0,1,2,3,2,4])
+        self.assertEqual(r.coefficients, [4,5])
+
+    def test_div_5(self):
+        # 0 quotient
+        one = Polynomial([1,0,-1])
+        two = Polynomial([1,1,0,0,-1])
+
+        q, r = divmod(one, two)
+        self.assertEqual(q, one // two)
+        self.assertEqual(r, one % two)
+
+        self.assertEqual(q.coefficients, [0])
+        self.assertEqual(r.coefficients, [1,0,-1])
+
+    def test_div_6(self):
+        one = Polynomial([1,0,0,2,2,0,1,-2,-4])
+        two = Polynomial([1,0,-1])
+
+        q, r = divmod(one, two)
+        self.assertEqual(q, one // two)
+        self.assertEqual(r, one % two)
+
+        self.assertEqual(q.coefficients, [1,0,1,2,3,2,4])
+        self.assertEqual(r.coefficients, [0])
+
     def test_floor_division_1(self):
         f = Polynomial(2, 3, -1, 5)
         g = Polynomial(1, 0, 1, name="g")
