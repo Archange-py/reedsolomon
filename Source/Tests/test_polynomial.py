@@ -1,20 +1,31 @@
 """Test file for polynomial's classe"""
 
-import unittest
 
 import sys
+
 import os
+
 
 # Add the path of the parent repertory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.append(parent_dir)
 
+import unittest
+
+from doctest import testmod
+
 from polynomial import Polynomial
 
 
 class TestPolynomial(unittest.TestCase):
     """Tests to check all of Polynomial's functionnality"""
+
+    # Docstring test
+    def test_docstring(self):
+        results = testmod(__import__("polynomial"), verbose=True)
+
+        self.assertFalse(bool(results.failed))
 
     # String test
     def test_str_1(self):
@@ -183,7 +194,7 @@ class TestPolynomial(unittest.TestCase):
     def test_tips_dict_1(self):
         f = Polynomial(0, -3, 23, -67, 0)
 
-        #self.assertDictEqual(dict(f), {"x3":-3, "x2":23, "x1":-67, "x0":0})
+        self.assertDictEqual(f.sparse, {"x3":-3, "x2":23, "x1":-67, "x0":0})
 
     def test_degree_1(self):
         f = Polynomial(-3, 23, -67)

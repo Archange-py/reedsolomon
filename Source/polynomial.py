@@ -26,10 +26,253 @@ class PolynomialError(Exception):
 
 
 class Polynomial:
-    _dictionnary = "abcdefghijklmnopqrstuvwxyz" # to use the notation f.a, f.b, f.c for example
+    """Basic class for implementing a Polynomial in object-oriented programming
+    
+    Args:
+        *coefficients (tuple, optional): An iterable containing the various coefficients of the polynomial, or a list of coefficients from largest to smallest.
+        name (str, optional): function name. Defaults to "f".
+        **sparse (dict, optional): An association of x with its associated coefficient.
+
+    Examples:
+
+        * There are three ways to initialize a Polynomial object.
+
+        Simply, creates a polynomial using the arguments
+        as coefficients in order of decreasing power:
+        >>> print(Polynomial(5, 4, 3, 2, 1, 0))
+        f(x) = 5x^5 + 4x^4 + 3x^3 + 2x² + x
+
+        With a list, tuple, or other iterable, creates a polynomial using
+        the items as coefficients in order of decreasing power:
+        >>> print(Polynomial([5, 0, 0, 0, 0, 0]))
+        f(x) = 5x^5
+
+        With keyword arguments such as for example x3=5, sets the
+        coefficient of x^3 to be 5:
+        >>> print(Polynomial(x32=5, x64=8))
+        f(x) = 8x^64 + 5x^32
+
+        >>> print(Polynomial(x5=5, x9=4, x0=2)) 
+        f(x) = 4x^9 + 5x^5 + 2
+
+        With no arguments, creates an empty polynomial:
+        >>> Polynomial() == Polynomial(0) == Polynomial([0, 0, 0])
+        True
+
+        * You can get attributes using multiple syntaxes:
+
+        X notation:
+
+        >>> f = Polynomial(-3, 23, -67)
+        >>> f.x2, f.x1, f.x0
+        (-3, 23, -67)
+        >>> f.x2 = 34
+        >>> f
+        Polynomial(x2=34, x=23, -67)
+
+        Alphabetic notation (max is z):
+
+        >>> f = Polynomial(-3, 23, -67)
+        >>> f.a, f.b, f.c
+        (-3, 23, -67)
+        >>> f.a = -3
+        >>> f
+        Polynomial(x2=-3, x=23, -67)
+        >>> f = Polynomial(x5=-4, x4=3, x3=-56, x2=1, x1=26, x0=3)
+        >>> f.a, f.b, f.c, f.d, f.e, f.f
+        (-4, 3, -56, 1, 26, 3)
+
+        List notation:
+
+        >>> f = Polynomial(-3, 23, -67)
+        >>> f[2], f[1], f[0]
+        (-3, 23, -67)
+        >>> f[2] = 34
+        >>> f
+        Polynomial(x2=34, x=23, -67)
+
+        * Operations:
+
+        Addition:
+
+        >>> f = Polynomial(x5=35, x2=-3, x0=1)
+        >>> g = Polynomial(21, 5, -1, name="g")
+
+        >>> h = f + g
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 35x^5 + 18x² + 5x
+
+        >>> h = g + 1
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 5x + 1
+
+        Substraction:
+
+        >>> f = Polynomial(x5=35, x2=-3, x0=1)
+        >>> g = Polynomial(21, 5, -1, name="g")
+
+        >>> h = f - g
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 35x^5 - 24x² - 5x + 2
+
+        >>> h = f - 1
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 35x^5 - 3x^2
+
+        Multiplication:
+
+        >>> h = f * g
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 175x^6 - 15x^3 + 5x
+
+        >>> h = f * 3
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 105x^5 - 9x² + 3
+
+        Negative:
+
+        >>> f = Polynomial(5, -3, 1)
+        >>> h = -f
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = -5x² + 3x - 1
+
+        Power:
+
+        >>> f = Polynomial(5, -3, 1)
+        >>> print(f)
+        f(x) = 5x² - 3x + 1
+        >>> print(f * f)
+        f(x) = 25x^4 - 30x^3 + 19x² - 6x + 1
+
+        >>> h = f**2 # only positive and integers power
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 25x^4 - 30x^3 + 19x² - 6x + 1
+
+        Division:
+
+        >>> f = Polynomial(2, 3, -1, 5)
+        >>> g = Polynomial(1, 0, 1, name="g")
+        >>> print(f)
+        f(x) = 2x^3 + 3x² - x + 5
+        >>> print(g)
+        g(x) = x² + 1
+
+        >>> h = f / 2
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = x^3 + 1.5x² - 0.5x + 2.5
+
+        >>> h = f / g # # Warning: h is just the quotient, a remainder can exist !
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 2x + 3
+
+        Floor Division:
+
+        >>> h = f // 2
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = x^3 + 1.5x² - 0.5x + 2.5
+
+        >>> h = f // g # it's the same of f / g
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 2x + 3
+
+        Modulo:
+
+        >>> h = f % 2
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 0
+
+        >>> h = f % g
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = -3x + 2
+
+        Divmod:
+
+        >>> divmod(f, g)
+        (Polynomial(x=2, 3), Polynomial(x=-3, 2))
+
+        >>> h = Polynomial(2, 3) * Polynomial(1, 0, 1) + Polynomial(-3, 2)
+        >>> h.name = "h"
+        >>> print(h)
+        h(x) = 2x^3 + 3x² - x + 5
+
+        >>> h == f
+        True
+
+        * Tips:
+
+        >>> f = Polynomial(-3, 23, -67)
+        >>> x2, x1, x0 = f
+        >>> x2, x1, x0
+        (-3, 23, -67)
+
+        >>> len(f)
+        3
+
+        >>> list(f)
+        [-3, 23, -67]
+        >>> list(reversed(f))
+        [-67, 23, -3]
+
+        >>> 'x2' in f
+        True
+        >>> 'x36' in f
+        False
+
+        >>> f(5)
+        -27
+        >>> f(0)
+        -67
+
+        >>> int(f) == f.degree
+        True
+
+        >>> bool(f)
+        True
+        >>> bool(Polynomial())
+        False
+
+        >>> f = Polynomial(1, 1, -12)
+        >>> h = Polynomial(9, -30, 25, name="h")
+        >>> f == h
+        False
+        >>> f != h
+        True
+        >>> f = Polynomial(9, -30, 25)
+        >>> f == h
+        True
+
+        >>> f = Polynomial(-3, 23, -67)
+        >>> [coef for coef in f]
+        [-3, 23, -67]
+        >>> [coef for coef in reversed(f)]
+        [-67, 23, -3]
+        >>> [(x, v) for x, v in f.items()]
+        [('x2', -3), ('x1', 23), ('x0', -67)]
+
+    Raises:
+        PolynomialError: Specify coefficients list or keyword terms, not both.
+        PolynomialError: Sparse must be follow this exact syntax: 'x' + int.
+        PolynomialError: Coefficients must be (contains) a list of int or float.
+    """
+    _dictionnary = "abcdefghijklmnopqrstuvwxyz" # to use the alphabetic notation: f.a, f.b, f.c
 
     def __init__(self, *coefficients, name: str = "f", **sparse):
         """Basic class for implementing a Polynomial in object-oriented programming
+        (see the Polynomial's docstring for more informations)
 
         Args:
             *coefficients (tuple, optional): An iterable containing the various coefficients
@@ -49,8 +292,7 @@ class Polynomial:
         """Simple method for initializing a polynomial object after instantiating it.
 
         Args:
-            coefficients (tuple, optional): An iterable containing the various coefficients
-            of the polynomial, or a list of coefficients from largest to smallest. Defaults to ().
+            coefficients (tuple, optional): An iterable containing the various coefficients of the polynomial, or a list of coefficients from largest to smallest. Defaults to ().
             sparse (dict, optional): An association of x with its associated coefficient: x34=5, x0=8, .... Defaults to {}.
 
         Raises:
@@ -80,13 +322,28 @@ class Polynomial:
         else:
             self._sparse = sparse
 
-        self._checkfloat()
+        self._checkfloatsparse()
 
     @property
     def coefficients(self) -> list[int | float]:
-        """The list of coefficients, including null coefficients"""
+        """The list of coefficients, including null coefficients.
+
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.coefficients
+            [-3, 23, -67]
+
+            >>> f.coefficients = [45, 0, -3.8, 1]
+            >>> print(f)
+            f(x) = 45x^3 - 3.8x + 1
+
+            >>> f = Polynomial(0)
+            >>> f.coefficients
+            [0]
+
+        """
         x: list = [coef for _, coef in self.items()]
-        x = x[self._position_end_zeros(x):]
+        x = x[self.__class__._position_end_zeros(x):]
 
         if not x:
             x.append(0)
@@ -104,10 +361,20 @@ class Polynomial:
     @property
     def sparse(self) -> dict[str, int]:
         """A dictionary comprising an association of the
-        x power number and its associated coefficient."""
+        x power number and its associated coefficient.
+
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.sparse
+            {'x2': -3, 'x1': 23, 'x0': -67}
+
+            >>> f.sparse = {'x3':45, 'x1':-3.8, 'x0':1}
+            >>> print(f)
+            f(x) = 45x^3 - 3.8x + 1
+        """
         items = list(self._sparse.items())
         items.sort(key= lambda x: int(x[0][1:]), reverse=True)
-        n = self._position_end_zeros([value for _, value in items])
+        n = self.__class__._position_end_zeros([value for _, value in items])
 
         self._sparse = dict(items[n:])
         return self._sparse
@@ -122,7 +389,19 @@ class Polynomial:
 
     @property
     def degree(self) -> int:
-        """The maximum degree of the polynomial."""
+        """The maximum degree of the polynomial.
+
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.degree
+            2
+
+            >>> f[56] = 5
+            >>> f
+            Polynomial(x56=5, x2=-3, x=23, -67)
+            >>> f.degree
+            56
+        """
         return self._degree()
 
     @degree.setter
@@ -136,7 +415,15 @@ class Polynomial:
     @property
     def delta(self) -> float:
         """Polynomial discriminant, only available for second-degree
-        polynomials, otherwise returns an error. Result of b² - 4ac"""
+        polynomials, otherwise returns an error. Result of b² - 4ac
+
+        Examples:
+            >>> f = Polynomial(1, 1, -12)
+            >>> print(f)
+            f(x) = x² + x - 12
+            >>> f.delta
+            49.0
+        """
         if self.degree == 2 and sp:
             a, b, c = sp.symbols("a b c")
 
@@ -162,7 +449,15 @@ class Polynomial:
     @property
     def alpha(self) -> int | float:
         """Alpha of the polynomial, only available for second-degree polynomials,
-        otherwise returns an error. Result of -b / 2a."""
+        otherwise returns an error. Result of -b / 2a.
+
+        Examples:
+            >>> f = Polynomial(1, 1, -12)
+            >>> f.alpha, f.beta
+            (-0.5, -12.25)
+            >>> f.canonic()
+            '(x + 0.5)² - 12.25'
+        """
         if self._degree() == 2:
             return -self.b / (2 * self.a)
 
@@ -180,7 +475,15 @@ class Polynomial:
     @property
     def beta(self) -> int | float:
         """Beta of the polynomial, only available for second-degree polynomials,
-        otherwise returns an error. Result of 4ac - b² / 4a."""
+        otherwise returns an error. Result of 4ac - b² / 4a.
+
+        Examples:
+            >>> f = Polynomial(1, 1, -12)
+            >>> f.alpha, f.beta
+            (-0.5, -12.25)
+            >>> f.canonic()
+            '(x + 0.5)² - 12.25'
+        """
         if self._degree() == 2:
             return (4 * self.a * self.c - self.b**2) / 4 * self.a
 
@@ -251,12 +554,12 @@ class Polynomial:
         if isinstance(value, (int, float)):
             if len(x) > 1 and x[0] == "x" and x[1:].isdigit():
                 self.sparse[x] = value
-                self._checkfloat()
+                self._checkfloatsparse()
 
             elif x in self.__class__._dictionnary and self._degree() <= 27:
                 dico: str = self.__class__._dictionnary[:self._degree() + 1]
                 self.sparse["x" + str(len(dico) - dico.index(x) - 1)] = value
-                self._checkfloat()
+                self._checkfloatsparse()
 
         else:
             super().__setattr__(x, value)
@@ -300,7 +603,7 @@ class Polynomial:
             value (int): The new value.
         """
         self.sparse["x" + str(x)] = value
-        self._checkfloat()
+        self._checkfloatsparse()
 
     def __delitem__(self, x: int):
         """In the manner of a list, del the input degree.
@@ -323,7 +626,7 @@ class Polynomial:
         coefficients = self.coefficients
         coefficients.reverse()
 
-        return coefficients[self._position_end_zeros(coefficients):]
+        return coefficients[self.__class__._position_end_zeros(coefficients):]
 
     def __contains__(self, x: str) -> bool:
         """Checks whether the input degree is less than the maximum degree of the polynomial
@@ -361,6 +664,7 @@ class Polynomial:
         return eval(string)
 
     def __int__(self) -> int:
+        """Return the degree of the polynomial"""
         return self.degree
 
     def __str__(self) -> str:
@@ -594,30 +898,63 @@ class Polynomial:
         return self
 
     def __hash__(self) -> int:
-        """Return the hash from the dictionary."""
+        """Return the hash from the dictionary"""
         return hash(self.sparse)
 
     def copy(self) -> Self:
-        """Copy the polynomial"""
+        """Copy the polynomial
+        
+        Examples:
+            >>> h = Polynomial(9, -30, 25, name="h")
+            >>> print(h)
+            h(x) = 9x² - 30x + 25
+
+            >>> _h = h.copy()
+            >>> print(_h)
+            h(x) = 9x² - 30x + 25
+        """
         P = self.__class__(name=self.name)
         P._init(sparse=self.sparse)
 
         return P
 
     def _degree(self) -> int:
-        """Returns the updated degree of the polynomial"""
+        """Returns the updated degree of the polynomial
+
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.degree
+            2
+
+            >>> f[56] = 5
+            >>> f
+            Polynomial(x56=5, x2=-3, x=23, -67)
+            >>> f.degree
+            56
+        """
         if len(self.coefficients) == 1 and not self.coefficients[0]:
             return 0
 
         else:
             return max([int(x[1:]) for x in self.sparse.keys()])
 
-    def _position_end_zeros(self, iterable: Iterable) -> int:
+    @staticmethod
+    def _position_end_zeros(iterable: Iterable[int | float]) -> int:
         """From the list of coefficients, return the position furthest to
         the right from the left where the zeros cancel the powers of x.
 
         Args:
             iterable (Iterable): The oredered list of coefficients in descending order.
+
+        Examples:
+            >>> l = [0 for _ in range(5)] + [6, 0, -3, 1.5]
+            >>> l
+            [0, 0, 0, 0, 0, 6, 0, -3, 1.5]
+            >>> n = Polynomial._position_end_zeros(l)
+            >>> n
+            5
+            >>> l[n:]
+            [6, 0, -3, 1.5]
 
         Returns:
             int: The position from left.
@@ -632,29 +969,110 @@ class Polynomial:
 
         return n
 
-    def _checkfloat(self):
-        """A function to change float coefficient in integers, when it's possible, and update the coefficients attribute."""
-        for i in range(self.degree, -1, -1):
-            coef: int = self[i]
+    @staticmethod
+    def _checkfloat(iterable: Iterable[int | float]) -> Iterable[int | float]:
+        """A function to change float coefficient in integers, when it's possible.
 
+        Args:
+            iterable (Iterable[int  |  float]): The iterator containing int or float numbers.
+
+        Example:
+            >>> l = [5.0, -3.67, 1.0, 98.1]
+            >>> Polynomial._checkfloat(l)
+            [5, -3.67, 1, 98.1]
+
+        Returns:
+            Iterable[int | float]: The checked iterator.
+        """
+        _iter: list[int | float] = []
+
+        for coef in iterable:
             if coef:
                 n = str(coef).find('.')
 
                 if (len(str(coef)[n:]) == 2 and not int(str(coef)[-1])) or n == -1:
-                   self._sparse["x" + str(i)] = int(coef)
+                   _iter.append(int(coef))
 
                 else:
-                    self._sparse["x" + str(i)] = coef
+                    _iter.append(coef)
+
+            else:
+                _iter.append(0)
+
+        return _iter
+
+    def _checkfloatsparse(self):
+        """A function to update coefficients attributes. By default call in the _init, and sets methode.
+
+        Examples:
+            >>> f = Polynomial(5.0, -3.67, 1.0, 98.1)
+            >>> print(f)
+            f(x) = 5x^3 - 3.67x² + x + 98.1
+        """
+        iterator: list[int | float] = reversed([self[i] for i in range(self.degree, -1, -1)])
+
+        for i, coef in enumerate(self.__class__._checkfloat(iterator)):
+            if coef:
+                self._sparse["x" + str(i)] = coef
 
     def items(self) -> list[tuple]:
-        """Returns sparse but ordoned dictionary items in descending order"""
+        """Returns sparse but ordoned dictionary items in descending order
+        
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.items() # just ordered
+            [('x2', -3), ('x1', 23), ('x0', -67)]
+            >>> dict(f.items()) == f.sparse
+            True
+        """
         items = list(self.sparse.items())
         items.sort(key= lambda x: int(x[0][1:]), reverse=True)
 
         return items
 
     def solve(self) -> tuple[float]:
-        """Solve the equation f(x) = 0"""
+        """Solve the equation f(x) = 0, and can use SymPy to get roots.
+        
+        Examples:
+        
+            * Solve 1st degrees equations
+            
+            >>> f = Polynomial(2, -26)
+            >>> f.solve()
+            13.0
+
+            * Solve 2nd degrees equations
+
+            With 2 roots:
+
+            >>> f = Polynomial(1, 1, -12)
+            >>> print(f)
+            f(x) = x² + x - 12
+            >>> f.delta
+            49.0
+            >>> f.solve()
+            (-4.0, 3.0)
+
+            With 1 root:
+            
+            >>> h = Polynomial(9, -30, 25, name="h")
+            >>> print(h)
+            h(x) = 9x² - 30x + 25
+            >>> h.delta
+            0.0
+            >>> h.solve()
+            (1.6666666666666667,)
+
+            * Solve any equations with SymPy
+
+            >>> f = Polynomial(x5=3, x2=23, x0=14)
+            >>> print(f)
+            f(x) = 3x^5 + 23x² + 14
+            >>> solutions = f.solve()
+            >>> solutions
+            ((-2.061777647931321+0j), (-0.023547692027920532-0.7769582400529271j), (-0.023547692027920532+0.7769582400529271j), (1.054436515993581-1.6230188809835164j), (1.054436515993581+1.6230188809835164j))
+
+        """
         delta = self.delta if self.degree == 2 else None
 
         if self.degree == 1:
@@ -683,7 +1101,13 @@ class Polynomial:
             raise PolynomialError("Solve an equation greater than the 2nd degree isn't implemented. Please install the 'sympy' libray if you want to solve them.")
 
     def developped(self) -> str:
-        """Returns the function's expanded form"""
+        """Returns the function's expanded form
+
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f.developped()
+            '-3x² + 23x - 67'
+        """
         string = " + ".join(str(self.sparse[x]) + "x^" + x[1:] for x, _ in self.items() if self.sparse[x] != 0)
         string = string.replace("+ -", "- ").replace("x^1 ", "x ").replace("x^0", "").replace(" 1x", " x").replace("-1x", "-x").replace("x^2 ", "x² ")
 
@@ -703,6 +1127,13 @@ class Polynomial:
 
         Args:
             decimal (int, optional): The number of decimal if coefficients, alpha or beta are floating numbers. Defaults to 3.
+
+        Examples:
+            >>> f = Polynomial(1, 1, -12)
+            >>> f.alpha, f.beta
+            (-0.5, -12.25)
+            >>> f.canonic()
+            '(x + 0.5)² - 12.25'
 
         Raises:
             NotImplementedError: The polynomial is not of the second degree.
@@ -727,6 +1158,15 @@ class Polynomial:
 
         Args:
             decimal (int, optional): The number of decimal if coefficients are floating numbers. Defaults to 3.
+
+        Examples:
+            >>> f = Polynomial(1, 1, -12)
+            >>> f.factorised()
+            '(x + 4.0)(x - 3.0)'
+
+            >>> h = Polynomial(9, -30, 25, name="h")
+            >>> h.factorised()
+            '9(x - 1.667)²'
 
         Raises:
             PolynomialError: Causes an error if the polynomial does not pass on the x-axis.
@@ -758,6 +1198,17 @@ class Polynomial:
             raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
 
     def derive(self) -> Self:
-        """Returns the derivative of the polynomial"""
+        """Returns the derivative of the polynomial
+        
+        Examples:
+            >>> f = Polynomial(-3, 23, -67)
+            >>> f
+            Polynomial(x2=-3, x=23, -67)
+
+            >>> h = f.derive()
+            >>> h
+            Polynomial(x=-134, 23)
+
+        """
         L = len(self)-1
         return self.__class__([(L-i) * self[i] for i in range(L)])
