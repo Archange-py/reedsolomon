@@ -1,0 +1,2 @@
+[console_scripts]
+reedsolomon = reedsolomon.__main__:main

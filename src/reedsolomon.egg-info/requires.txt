@@ -1,0 +1,5 @@
+mpmath==1.3.0
+sympy==1.13.3
+
+[dev]
+sympy

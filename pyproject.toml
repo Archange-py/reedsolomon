@@ -1,0 +1,31 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reedsolomon"
+version = "0.0.1"
+description = "A Python package for Reed-Solomon error correction codes"
+readme = "README.md"
+authors = [{ name = "Archange", email = "archange_paradise@proton.me" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["reedsolomon", "POO", "error-correcting code"]
+dependencies = [
+    "mpmath==1.3.0",
+    "sympy==1.13.3",
+]
+requires-python = ">=3.12.4"
+
+[project.optional-dependencies]
+dev = ["sympy"]
+
+[project.urls]
+Homepage = "https://github.com/Archange-py/Reed-Solomon_Codes"
+
+[project.scripts]
+reedsolomon = "reedsolomon.__main__:main"
