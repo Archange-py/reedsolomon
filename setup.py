@@ -9,6 +9,11 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/Archange-py/Reed-Solomon_Codes",
+    project_urls={
+        "Bug Tracker": "https://github.com/Archange-py/Reed-Solomon_Codes/issues",
+        "Documentation": "https://github.com/Archange-py/Reed-Solomon_Codes#readme",
+        "Source Code": "https://github.com/Archange-py/Reed-Solomon_Codes",
+    },
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[
