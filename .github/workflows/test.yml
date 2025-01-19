@@ -1,0 +1,38 @@
+name: Python Tests (unittest)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11, 3.12]
+
+    steps:
+      # Vérification du code source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Configuration de Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Installation des dépendances
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Exécution des tests avec unittest
+      - name: Run tests
+        run: |
+          python -m unittest discover -s tests -p "*.py"
