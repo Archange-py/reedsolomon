@@ -34,26 +34,28 @@ At present, only algorithms for polynomials and Galois fields are being develope
 ### Installation
 ***
 
-There is none for the moment.
+You can use this command from PyPi:
+- `pip install reedsolomon`
 
 
 ### Dependencies
 ***
 
-Use this command in cmd:
+Use this command in cmd if you are in a virtual environment:
 - `pip install -r requirements.txt`
+
 
 ### Usage  
 ***
 
 Here is examples to use the `polynomial.py` file:  
-- [`example_polynomial.ipynb`](./Source/Examples/examples_polynomial.ipynb)
+- [`example_polynomial.ipynb`](./examples/examples_polynomial.ipynb)
 
 The galois field file:
-- [`example_galois_field.ipynb`](./Source/Examples/examples_galois_field.ipynb)
+- [`example_galois_field.ipynb`](./examples/examples_galois_field.ipynb)
 
 And the reed solomon file:
-- [`example_reed_solomon.ipynb`](./Source/Examples/examples_reed_solomon.ipynb)
+- [`example_reed_solomon.ipynb`](./examples/examples_reed_solomon.ipynb)
 
 
 ## Repository Structure
@@ -62,26 +64,36 @@ File composition in the repository :
 
 ```plaintext
 .  
-├── Ressource  
+├── resource  
 │   ├── Documentation # all .pdf and .html  
 │   └── Picture # for the README  
 │
-├── Source  
-│   ├── Examples  
-│   │   ├── example_reed_solomon.ipynb
-│   │   ├── example_galois_field.ipynb
-│   │   └── example_polynomial.ipynb
-│   │
-│   └── Tests
-│       ├── test_reed_solomon.py
-│       ├── test_galois_field.py
-│       └── test_polynomial.py
+├── examples  
+│   ├── example_reed_solomon.ipynb 
+|   ├── example_galois_field.ipynb 
+│   └── example_polynomial.ipynb  
 │
+├── tests  
+│   ├── test_reed_solomon.ipynb 
+|   ├── test_galois_field.ipynb 
+│   └── test_polynomial.ipynb  
+|
+├── src  
+│   └── reedsolomon
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── polynomial.py
+│       ├── reedsolomon.py
+│       └── galoisfield.py
+│
+├── LICENSE
 ├── README.md
-├── LICENSE.md
 ├── TODO.md
 ├── notes.txt
 ├── requirements.txt
+├── MANIFEST.in
+├── pyproject.toml
+├── setup.py
 └── .gitignore
 ```
 
