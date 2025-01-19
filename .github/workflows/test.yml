@@ -32,6 +32,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Ajouter le répertoire src au PYTHONPATH
+      - name: Set PYTHONPATH
+        run: |
+          echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+
       # Exécution des tests avec unittest
       - name: Run tests
         run: |
