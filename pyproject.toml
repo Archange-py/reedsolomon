@@ -29,3 +29,6 @@ Homepage = "https://github.com/Archange-py/Reed-Solomon_Codes"
 
 [project.scripts]
 reedsolomon = "reedsolomon.__main__:main"
+
+[tools.setuptools]
+packages = ["src"]

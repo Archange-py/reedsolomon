@@ -19,7 +19,7 @@ jobs:
       # Installer la version spécifiée de Python
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"  # Version de Python utilisée pour le build
+          python-version: "3.12.4"  # Version de Python utilisée pour le build
 
       # Construire les distributions (source + wheel)
       - name: Build release distributions
@@ -44,7 +44,6 @@ jobs:
 
     environment:
       name: pypi
-      # URL du projet PyPI (remplacez `reedsolomon` par le nom exact de votre package)
       url: https://pypi.org/project/reedsolomon/
 
     steps:
