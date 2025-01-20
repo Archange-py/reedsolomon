@@ -1175,7 +1175,7 @@ class Polynomial:
         Returns:
             str: _description_
         """
-        if self.degree == 2:
+        if self.degree == 2 and self.delta >= 0:
             solutions = self.solve()
 
             if solutions is None:
@@ -1193,6 +1193,9 @@ class Polynomial:
                 string = string[1:]
 
             return string
+
+        elif self.degree == 2 and self.delta < 0:
+            return self.developped()
 
         else:
             raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")

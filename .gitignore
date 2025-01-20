@@ -1,2 +1,17 @@
 __pycache__
 __pycache__/*
+
+.github
+.github/*
+
+.venv
+.venv/*
+
+.vscode
+.vscode/*
+
+.build
+.build/*
+
+.dist
+.dist/*
