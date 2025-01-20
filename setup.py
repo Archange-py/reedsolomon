@@ -22,5 +22,8 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.12.4",
-    install_requires=open(".\\requirements.txt", encoding="UTF-8").read().splitlines(),
+    install_requires=[
+        "mpmath==1.3.0",
+        "sympy==1.13.3",
+    ]
 )
