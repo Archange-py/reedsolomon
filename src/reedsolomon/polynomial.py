@@ -108,7 +108,7 @@ class Polynomial:
         >>> print(h)
         h(x) = 5x + 1
 
-        Substraction:
+        Subtraction:
 
         >>> f = Polynomial(x5=35, x2=-3, x0=1)
         >>> g = Polynomial(21, 5, -1, name="g")
@@ -268,7 +268,7 @@ class Polynomial:
         PolynomialError: Sparse must be follow this exact syntax: 'x' + int.
         PolynomialError: Coefficients must be (contains) a list of int or float.
     """
-    _dictionnary = "abcdefghijklmnopqrstuvwxyz" # to use the alphabetic notation: f.a, f.b, f.c
+    _dictionary = "abcdefghijklmnopqrstuvwxyz" # to use the alphabetic notation: f.a, f.b, f.c
 
     def __init__(self, *coefficients, name: str = "f", **sparse):
         """Basic class for implementing a Polynomial in object-oriented programming
@@ -288,7 +288,7 @@ class Polynomial:
         self._init(coefficients, sparse)
         self.name = name
 
-    def _init(self, coefficients: tuple = (), sparse: dict = {}):
+    def _init(self, coefficients: tuple = (), sparse: dict = None):
         """Simple method for initializing a polynomial object after instantiating it.
 
         Args:
@@ -300,11 +300,14 @@ class Polynomial:
             PolynomialError: Sparse must be follow this exact syntax: 'x' + int.
             PolynomialError: Coefficients must be (contains) a list of int or float.
         """
+        if sparse is None:
+            sparse = {}
+
         if coefficients and sparse:
             raise PolynomialError("Specify coefficients list or keyword terms, not both.")
 
-        if not all([len(x) > 1 and x[0] == "x" and x[1:].isdigit() for x in sparse.keys()]):
-            raise PolynomialError(f"Sparse must be follow this exact syntax: 'x' + int.")
+        if not all(len(x) > 1 and x[0] == "x" and x[1:].isdigit() for x in sparse):
+            raise PolynomialError("Sparse must be follow this exact syntax: 'x' + int.")
 
         if not sparse:
             if len(coefficients) == 1 and issubclass(type(coefficients[0]), Iterable):
@@ -312,12 +315,12 @@ class Polynomial:
             else:
                 coefficients = list(coefficients)
 
-            if not all([isinstance(x, (int, float)) for x in coefficients]):
-                raise PolynomialError(f"Coefficients must be (contains) a list of int or float.")
+            if not all(isinstance(x, (int, float)) for x in coefficients):
+                raise PolynomialError("Coefficients must be (contains) a list of int or float.")
 
             coefficients.reverse()
 
-            self._sparse = {"x" + str(x):v for x, v in enumerate(coefficients)}
+            self._sparse = {f"x{str(x)}": v for x, v in enumerate(coefficients)}
 
         else:
             self._sparse = sparse
@@ -432,7 +435,7 @@ class Polynomial:
 
             return float(result.evalf())
 
-        elif self.degree == 2 and not sp:
+        elif self.degree == 2:
             return self.b**2 - 4 * self.a * self.c
 
         else:
@@ -514,17 +517,13 @@ class Polynomial:
             int | float: Returns the associated coefficient.
         """
         if len(x) > 1 and x[0] == "x":
-            if x[1:].isdigit():
-                if not x in self.sparse.keys():
-                    return 0
- 
-                return self.sparse[x]
-
-            else:
+            if not x[1:].isdigit():
                 raise PolynomialError(f"{x} must be follow this exact syntax: 'x' + int.")
 
-        elif x in self.__class__._dictionnary and self._degree() <= 27:
-            dico = self.__class__._dictionnary[:self._degree() + 1]
+            return 0 if x not in self.sparse.keys() else self.sparse[x]
+
+        elif x in self.__class__._dictionary and self._degree() <= 27:
+            dico = self.__class__._dictionary[:self._degree() + 1]
 
             if x not in dico:
                 raise PolynomialError(f"{x} must be in this list: {", ".join(list(dico))}")
@@ -536,10 +535,12 @@ class Polynomial:
                 for i, _x in zip(range(self._degree() + 1), list_x):
                     assert i == _x
 
-            except AssertionError:
-                raise PolynomialError(f"Polynomial must has coefficients in this order: self.degree, ..., 2, 1, 0.")
+            except AssertionError as e:
+                raise PolynomialError(
+                    "Polynomial must has coefficients in this order: self.degree, ..., 2, 1, 0."
+                ) from e
 
-            return self.sparse["x" + str(len(dico) - dico.index(x) - 1)]
+            return self.sparse[f"x{str(len(dico) - dico.index(x) - 1)}"]
 
         else:
             raise AttributeError(f"{x} was not found.")
@@ -556,9 +557,9 @@ class Polynomial:
                 self.sparse[x] = value
                 self._checkfloatsparse()
 
-            elif x in self.__class__._dictionnary and self._degree() <= 27:
-                dico: str = self.__class__._dictionnary[:self._degree() + 1]
-                self.sparse["x" + str(len(dico) - dico.index(x) - 1)] = value
+            elif x in self.__class__._dictionary and self._degree() <= 27:
+                dico: str = self.__class__._dictionary[:self._degree() + 1]
+                self.sparse[f"x{str(len(dico) - dico.index(x) - 1)}"] = value
                 self._checkfloatsparse()
 
         else:
@@ -573,9 +574,9 @@ class Polynomial:
         if len(x) > 1 and x[0] == "x" and x[1:].isdigit():
             del self.sparse[x]
 
-        elif x in self.__class__._dictionnary and self._degree() <= 27:
-            dico: str = self.__class__._dictionnary[:self._degree() + 1]
-            del self.sparse["x" + str(len(dico) - dico.index(x) - 1)]
+        elif x in self.__class__._dictionary and self._degree() <= 27:
+            dico: str = self.__class__._dictionary[:self._degree() + 1]
+            del self.sparse[f"x{str(len(dico) - dico.index(x) - 1)}"]
 
         else:
             super().__delattr__(x)
@@ -590,7 +591,7 @@ class Polynomial:
             int: Returns the associated coefficient
         """
         try:
-            return self.sparse["x" + str(x)]
+            return self.sparse[f"x{x}"]
 
         except KeyError:
             return 0
@@ -602,7 +603,7 @@ class Polynomial:
             x (int): The degree that you want, like the index in a list.
             value (int): The new value.
         """
-        self.sparse["x" + str(x)] = value
+        self.sparse[f"x{x}"] = value
         self._checkfloatsparse()
 
     def __delitem__(self, x: int):
@@ -611,7 +612,7 @@ class Polynomial:
         Args:
             x (int): The degree that you want, like the index in a list.
         """
-        del self.sparse["x" + str(x)]
+        del self.sparse[f"x{x}"]
 
     def __len__(self) -> int:
         """Returns the “length” of the polynomial, i.e. its degree + 1"""
@@ -646,7 +647,7 @@ class Polynomial:
         return x in self.sparse.keys()
 
     def __bool__(self) -> bool:
-        """Detreminate if the polynomial is not null"""
+        """Determinate if the polynomial is not null"""
         return not (len(self.coefficients) == 1 and not self.coefficients[0])
 
     def __call__(self, x: int | float) -> int | float:
@@ -658,7 +659,11 @@ class Polynomial:
         Returns:
             int | float: The y-axis.
         """
-        string = " + ".join(str(self.sparse[x]) + " * x**" + x[1:] for x, _ in self.items() if self.sparse[x] != 0)
+        string = " + ".join(
+            f"{str(self.sparse[x])} * x**{x[1:]}"
+            for x, _ in self.items()
+            if self.sparse[x] != 0
+        )
         string = string.replace("+ -", "- ").replace("x^1 ", "x").replace("x^0", "").replace("1x", "x")
 
         return eval(string)
@@ -669,15 +674,11 @@ class Polynomial:
 
     def __str__(self) -> str:
         """Returns the expanded form of the function"""
-        return f"{self.name}(x) = {self.developped()}"
+        return f"{self.name}(x) = {self.developed()}"
 
     def __repr__(self) -> str:
         """Returns the formal form of the function"""
-        string = ", ".join(x + "=" + str(v) for x, v in self.items() if v != 0)
-        string = string.replace("x1=", "x=").replace("x0=", "")
-
-        if not string:
-            string = "0"
+        string: str = ", ".join(f"{x}={str(v)}" for x, v in self.items() if v != 0).replace("x1=", "x=").replace("x0=", "") or '0'
 
         return f'{self.__class__.__qualname__}({string})'
 
@@ -772,18 +773,17 @@ class Polynomial:
     __rsub__ = __isub__ = __sub__
 
     def __mul__(self, other: Self | (int | float)) -> Self:
-        """Muls two polynomials or a polynomial and a number."""
+        """Multiply two polynomials or a polynomial and a number."""
         if isinstance(other, self.__class__):
             liste, n = [], 0
 
             for i in range(self.degree, -1, -1):
-                if self[i]:
-                    liste.append(self.__class__())
-                    for j in range(other.degree, -1, -1):
-                        liste[n][i + j] = self[i] * other[j]
-
-                else:
+                if not self[i]:
                     continue
+
+                liste.append(self.__class__())
+                for j in range(other.degree, -1, -1):
+                    liste[n][i + j] = self[i] * other[j]
 
                 n += 1
 
@@ -814,7 +814,7 @@ class Polynomial:
     __rtruediv__ = __itruediv__ = __truediv__
 
     def __floordiv__(self, other: Self | (int | float)) -> Self:
-        """Return the quotient if the divison is between two polynomial, or the result of a normal division."""
+        """Return the quotient if the division is between two polynomial, or the result of a normal division."""
         if isinstance(other, self.__class__):
             return divmod(self, other)[0]
 
@@ -827,7 +827,7 @@ class Polynomial:
     __ifloordiv__ = __floordiv__
 
     def __mod__(self, other: Self | (int | float)) -> Self:
-        """Return the remainder if the divison is between two polynomial, or a null polynomial."""
+        """Return the remainder if the division is between two polynomial, or a null polynomial."""
         if isinstance(other, self.__class__):
             return divmod(self, other)[1]
 
@@ -936,7 +936,7 @@ class Polynomial:
             return 0
 
         else:
-            return max([int(x[1:]) for x in self.sparse.keys()])
+            return max(int(x[1:]) for x in self.sparse.keys())
 
     @staticmethod
     def _position_end_zeros(iterable: Iterable[int | float]) -> int:
@@ -944,7 +944,7 @@ class Polynomial:
         the right from the left where the zeros cancel the powers of x.
 
         Args:
-            iterable (Iterable): The oredered list of coefficients in descending order.
+            iterable (Iterable): The ordered list of coefficients in descending order.
 
         Examples:
             >>> l = [0 for _ in range(5)] + [6, 0, -3, 1.5]
@@ -1002,7 +1002,7 @@ class Polynomial:
         return _iter
 
     def _checkfloatsparse(self):
-        """A function to update coefficients attributes. By default call in the _init, and sets methode.
+        """A function to update coefficients attributes. By default call in the _init, and sets method.
 
         Examples:
             >>> f = Polynomial(5.0, -3.67, 1.0, 98.1)
@@ -1013,10 +1013,10 @@ class Polynomial:
 
         for i, coef in enumerate(self.__class__._checkfloat(iterator)):
             if coef:
-                self._sparse["x" + str(i)] = coef
+                self._sparse[f"x{str(i)}"] = coef
 
     def items(self) -> list[tuple]:
-        """Returns sparse but ordoned dictionary items in descending order
+        """Returns sparse but ordered dictionary items in descending order
         
         Examples:
             >>> f = Polynomial(-3, 23, -67)
@@ -1087,28 +1087,35 @@ class Polynomial:
             return tuple(solutions)
 
         elif self.degree == 2 and delta == 0:
-            return tuple([-self.b / (2 * self.a)])
+            return (-self.b / (2 * self.a), )
 
         elif sp:
             x = sp.symbols("x")
+            expression = eval(
+                " + ".join(
+                    f"{str(value)} * x**{_x[1:]}" for _x, value in self.items()
+                ),
+                {"x": x},
+            )
 
-            expression = eval(" + ".join(str(value) + " * x**" + _x[1:] for _x, value in self.items()), {"x":x})
-            solutions = tuple(complex(sol.evalf()) for sol in sp.solve(expression))
-
-            return solutions
+            return tuple(complex(sol.evalf()) for sol in sp.solve(expression))
 
         else:
-            raise PolynomialError("Solve an equation greater than the 2nd degree isn't implemented. Please install the 'sympy' libray if you want to solve them.")
+            raise PolynomialError("Solve an equation greater than the 2nd degree isn't implemented. Please install the 'sympy' library if you want to solve them.")
 
-    def developped(self) -> str:
+    def developed(self) -> str:
         """Returns the function's expanded form
 
         Examples:
             >>> f = Polynomial(-3, 23, -67)
-            >>> f.developped()
+            >>> f.developed()
             '-3x² + 23x - 67'
         """
-        string = " + ".join(str(self.sparse[x]) + "x^" + x[1:] for x, _ in self.items() if self.sparse[x] != 0)
+        string = " + ".join(
+            f"{str(self.sparse[x])}x^{x[1:]}"
+            for x, _ in self.items()
+            if self.sparse[x] != 0
+        )
         string = string.replace("+ -", "- ").replace("x^1 ", "x ").replace("x^0", "").replace(" 1x", " x").replace("-1x", "-x").replace("x^2 ", "x² ")
 
         if string.endswith("^1"):
@@ -1141,17 +1148,16 @@ class Polynomial:
         Returns:
             str: A string of the canonical form.
         """
-        if self.degree == 2:
-            string = f"{self.a}(x - {round(self.alpha, decimal)})² + {round(self.beta, decimal)}"
-            string = string.replace("- -", "+ ").replace("+ -", "- ").replace("-1(", "-(").replace("² + 0", "").replace("² - 0", "")
-
-            if string.startswith("1("):
-                string = string[1:]
-
-            return string
-
-        else:
+        if self.degree != 2:
             raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
+
+        string = f"{self.a}(x - {round(self.alpha, decimal)})² + {round(self.beta, decimal)}"
+        string = string.replace("- -", "+ ").replace("+ -", "- ").replace("-1(", "-(").replace("² + 0", "").replace("² - 0", "")
+
+        if string.startswith("1("):
+            string = string[1:]
+
+        return string
 
     def factorised(self, decimal: int = 3) -> str:
         """Returns the factorized form, only if the polynomial is of the second degree
@@ -1175,30 +1181,26 @@ class Polynomial:
         Returns:
             str: _description_
         """
-        if self.degree == 2 and self.delta >= 0:
-            solutions = self.solve()
-
-            if solutions is None:
-                raise PolynomialError("Factorised expression doesn't exist.")
-
-            elif len(solutions) == 1:
-                string = f"{self.a}(x - {round(solutions[0], decimal)})²"
-
-            elif len(solutions) == 2:
-                string = f"{self.a}(x - {round(solutions[0], decimal)})(x - {round(solutions[1], decimal)})"
-
-            string = string.replace("- -", "+ ").replace("-1(", "-(")
-
-            if string.startswith("1("):
-                string = string[1:]
-
-            return string
-
-        elif self.degree == 2 and self.delta < 0:
-            return self.developped()
-
-        else:
+        if self.degree != 2:
             raise NotImplementedError("For the moment, only implemented for 2nd degree equations.")
+
+        solutions = self.solve()
+
+        if solutions is None:
+            raise PolynomialError("Factorised expression doesn't exist.")
+
+        elif len(solutions) == 1:
+            string = f"{self.a}(x - {round(solutions[0], decimal)})²"
+
+        elif len(solutions) == 2:
+            string = f"{self.a}(x - {round(solutions[0], decimal)})(x - {round(solutions[1], decimal)})"
+
+        string = string.replace("- -", "+ ").replace("-1(", "-(")
+
+        if string.startswith("1("):
+            string = string[1:]
+
+        return string
 
     def derive(self) -> Self:
         """Returns the derivative of the polynomial

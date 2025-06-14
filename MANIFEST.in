@@ -1,14 +1,13 @@
 # Misc
-include LICENSE.txt
-include README.md
 include TODO.md
-include notes.txt
+include README.md
+include LICENSE.txt
 
 # Resource
-recursive-include resource/ *
+recursive-include resources *
 
 # Examples
-recursive-include examples/ *
+recursive-include examples *
 
 # Tests
-recursive-include tests/ *
+recursive-include tests *

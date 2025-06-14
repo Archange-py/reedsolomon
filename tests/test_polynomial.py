@@ -9,7 +9,7 @@ from reedsolomon import Polynomial
 
 
 class TestPolynomial(unittest.TestCase):
-    """Tests to check all of Polynomial's functionnality"""
+    """Tests to check all of Polynomial's functionality"""
 
     # Docstring test
     def test_docstring(self):
@@ -260,10 +260,10 @@ class TestPolynomial(unittest.TestCase):
                                           (1.054436515993581-1.6230188809835164j),
                                           (1.054436515993581+1.6230188809835164j)))
 
-    def test_expression_developped_1(self):
+    def test_expression_developed_1(self):
         f = Polynomial(1, 1, -12)
 
-        self.assertEqual(f.developped(), "x² + x - 12")
+        self.assertEqual(f.developed(), "x² + x - 12")
 
     def test_expression_canonic_1(self):
         f = Polynomial(1, 1, -12)
@@ -271,12 +271,12 @@ class TestPolynomial(unittest.TestCase):
         self.assertTupleEqual((f.alpha, f.beta), (-0.5, -12.25))
         self.assertEqual(f.canonic(), "(x + 0.5)² - 12.25")
 
-    def test_expression_factorised_1(self):
+    def test_expression_factorise_1(self):
         f = Polynomial(1, 1, -12)
 
         self.assertEqual(f.factorised(), "(x + 4.0)(x - 3.0)")
 
-    def test_expression_factorised_2(self):
+    def test_expression_factorise_2(self):
         h = Polynomial(9, -30, 25, name="h")
 
         self.assertEqual(h.factorised(), "9(x - 1.667)²")
@@ -389,18 +389,15 @@ class TestPolynomial(unittest.TestCase):
 
     def test_div_1(self):
         f = Polynomial(x5=35, x2=-3, x0=1)
-
-        h = f / 2
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = 17.5x^5 - 1.5x² + 0.5")
+        self._extracted_from_test_div_1(f, "h(x) = 17.5x^5 - 1.5x² + 0.5")
 
         f = Polynomial(2, 3, -1, 5)
+        self._extracted_from_test_div_1(f, "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
 
-        h = f / 2
-        h.name = "h"
+    def _extracted_from_test_div_1(self, f, arg1):
+        result = f / 2
 
-        self.assertEqual(str(h), "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
+        return self._extracted_from_rename(result, arg1)
 
     def test_div_2(self):
         f = Polynomial(2, 3, -1, 5)
@@ -458,31 +455,25 @@ class TestPolynomial(unittest.TestCase):
 
     def test_floor_division_1(self):
         f = Polynomial(2, 3, -1, 5)
+        self._extracted_from_test_floor_division_1(f, 2, "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
+
         g = Polynomial(1, 0, 1, name="g")
+        self._extracted_from_test_floor_division_1(f, g, "h(x) = 2x + 3")
 
-        h = f // 2
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = x^3 + 1.5x² - 0.5x + 2.5")
-
-        h = f // g
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = 2x + 3")
+    def _extracted_from_test_floor_division_1(self, f, arg1, arg2):
+        result = f // arg1
+        return self._extracted_from_rename(result, arg2)
 
     def test_modulo_1(self):
         f = Polynomial(2, 3, -1, 5)
+        self._extracted_from_test_modulo_1(f, 2, "h(x) = 0")
+
         g = Polynomial(1, 0, 1, name="g")
+        self._extracted_from_test_modulo_1(f, g, "h(x) = -3x + 2")
 
-        h = f % 2
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = 0")
-
-        h = f % g
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = -3x + 2")
+    def _extracted_from_test_modulo_1(self, f, arg1, arg2):
+        result = f % arg1
+        return self._extracted_from_rename(result, arg2)
 
     def test_divmod_1(self):
         f = Polynomial(2, 3, -1, 5)
@@ -501,19 +492,22 @@ class TestPolynomial(unittest.TestCase):
     def test_pow_1(self):
         f = Polynomial(5, -3, 1)
 
-        h = f**2
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = 25x^4 - 30x^3 + 19x² - 6x + 1")
-
-        h = f**3
-        h.name = "h"
-
-        self.assertEqual(str(h), "h(x) = 125x^6 - 225x^5 + 210x^4 - 117x^3 + 42x² - 9x + 1")
+        h = self._extracted_from_test_pow_1(f, 2, "h(x) = 25x^4 - 30x^3 + 19x² - 6x + 1")
+        h = self._extracted_from_test_pow_1(f, 3, "h(x) = 125x^6 - 225x^5 + 210x^4 - 117x^3 + 42x² - 9x + 1")
 
         f **= 3
 
         self.assertEqual(f, h)
+
+    def _extracted_from_test_pow_1(self, f, arg1, arg2):
+        result = f**arg1
+        return self._extracted_from_rename(result, arg2)
+
+    # TODO Rename this here and in `_extracted_from_test_div_1`, `_extracted_from_test_floor_division_1`, `_extracted_from_test_modulo_1` and `_extracted_from_test_pow_1`
+    def _extracted_from_rename(self, result, arg1):
+        result.name = "h"
+        self.assertEqual(str(result), arg1)
+        return result
 
     def test_bool_1(self):
         f = Polynomial(5, -3, 1)

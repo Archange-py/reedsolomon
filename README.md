@@ -1,8 +1,21 @@
-<img src=".\Resource\Pictures\picture_2.png" alt="DALL-E Picture">  
+![Reedsolomon Banner](https://raw.githubusercontent.com/Archange-py/reedsolomon/refs/heads/main/resources/pictures/miniature_2.png)
 
 Image generated with DALL-E
 
 # Reed-Solomon Codes Implementation
+
+[![GitHub Stars](https://img.shields.io/github/stars/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/network)
+[![GitHub Issues](https://img.shields.io/github/issues/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/pulls)
+[![GitHub License](https://img.shields.io/github/license/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Archange-py/reedsolomon.svg)](https://github.com/Archange-py/reedsolomon/commits/main)
+![Tests](https://github.com/Archange-py/reedsolomon/actions/workflows/python-tests.yml/badge.svg)
+![Visiteurs](https://visitor-badge.laobi.icu/badge?page_id=Archange-py.reedsolomon)
+
+[![PyPI Version](https://img.shields.io/pypi/v/reedsolomon.svg)](https://pypi.org/project/reedsolomon/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/reedsolomon.svg)](https://pypi.org/project/reedsolomon/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/reedsolomon.svg)](https://pypi.org/project/reedsolomon/)
 
 Welcome to the **Reed-Solomon codes** GitHub repository! This project is dedicated to exploring Reed-Solomon codes. These codes are crucial in ensuring data integrity in digital communication and storage systems.
 
@@ -48,14 +61,14 @@ Use this command in cmd if you are in a virtual environment:
 ### Usage  
 ***
 
-Here is examples to use the `polynomial.py` file:  
-- [`example_polynomial.ipynb`](./examples/examples_polynomial.ipynb)
+Here is examples to use the Polynomial file:  
+- [`example_polynomial.ipynb`](./src/reedsolomon/examples/notebooks/examples_polynomial.ipynb)
 
-The galois field file:
-- [`example_galois_field.ipynb`](./examples/examples_galois_field.ipynb)
+The Galois Field file:
+- [`example_galois_field.ipynb`](./src/reedsolomon/examples/notebooks/examples_galois_field.ipynb)
 
-And the reed solomon file:
-- [`example_reed_solomon.ipynb`](./examples/examples_reed_solomon.ipynb)
+And the Reedsolomon file:
+- [`example_reed_solomon.ipynb`](./src/reedsolomon/examples/notebooks/examples_reed_solomon.ipynb)
 
 
 ## Repository Structure
@@ -64,14 +77,9 @@ File composition in the repository :
 
 ```plaintext
 .  
-├── resource  
-│   ├── Documentation # all .pdf and .html  
-│   └── Picture # for the README  
-│
-├── examples  
-│   ├── example_reed_solomon.ipynb 
-|   ├── example_galois_field.ipynb 
-│   └── example_polynomial.ipynb  
+├── resources  
+│   ├── documentation # all .pdf and .html  
+│   └── pictures # for the README  
 │
 ├── tests  
 │   ├── test_reed_solomon.ipynb 
@@ -80,20 +88,22 @@ File composition in the repository :
 |
 ├── src  
 │   └── reedsolomon
+│       ├── examples/notebooks  
+│       │   ├── example_reed_solomon.ipynb 
+|       │   ├── example_galois_field.ipynb 
+│       │   └── example_polynomial.ipynb  
+│       │
 │       ├── __init__.py
-│       ├── __main__.py
 │       ├── polynomial.py
 │       ├── reedsolomon.py
 │       └── galoisfield.py
 │
-├── LICENSE
+├── MANIFEST.in
+├── LICENSE.md
 ├── README.md
 ├── TODO.md
-├── notes.txt
 ├── requirements.txt
-├── MANIFEST.in
 ├── pyproject.toml
-├── setup.py
 └── .gitignore
 ```
 

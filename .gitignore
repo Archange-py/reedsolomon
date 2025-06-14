@@ -1,17 +1,9 @@
-__pycache__
-__pycache__/*
+__pycache__/
+*.py[cod]
+*.egg-info/
 
-.github
-.github/*
+.venv/
+.vscode/
 
-.venv
-.venv/*
-
-.vscode
-.vscode/*
-
-.build
-.build/*
-
-.dist
-.dist/*
+dist/
+build/
