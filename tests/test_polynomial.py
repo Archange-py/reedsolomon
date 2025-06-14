@@ -13,9 +13,9 @@ class TestPolynomial(unittest.TestCase):
 
     # Docstring test
     def test_docstring(self):
-        results = testmod(__import__("reedsolomon.polynomial"), verbose=True)
+        result = testmod(__import__("reedsolomon.polynomial"), verbose=True)
 
-        self.assertFalse(bool(results.failed))
+        self.assertEqual(result.failed, 0, f"Doctests failed: {result.failed} out of {result.attempted}")
 
     # String test
     def test_str_1(self):
