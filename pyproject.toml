@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reedsolomon"
-version = "0.0.2"
+version = "0.0.3"
 description = "A Python package for Reed-Solomon error correction codes"
 keywords = ["reedsolomon", "POO", "error-correcting code"]
 readme = "README.md"
