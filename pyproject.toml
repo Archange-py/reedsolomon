@@ -35,4 +35,4 @@ Library = "https://pypi.org/project/reedsolomon/"
 reedsolomon = "reedsolomon.reedsolomon:main"
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["unitest"]
